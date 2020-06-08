@@ -1,0 +1,18 @@
+{
+    "workbench.colorCustomizations": {
+        "[One Dark Pro]": {
+            "editor.background": "#1a1a1b",
+            "terminal.background": "#1a1a1b",
+            "statusBar.background": "#0894d4b9",
+            "statusBar.foreground": "#fff",
+            "terminal.foreground": "#aaa5a5"
+        }
+    },
+    "workbench.colorTheme": "One Dark Pro",
+    "editor.fontWeight": "500",
+    "editor.fontSize": 17,
+    "editor.tokenColorCustomizations": null,
+    "terminal.integrated.fontWeight": "500",
+    "terminal.integrated.fontWeightBold": "normal",
+    "oneDarkPro.bold": true
+}
