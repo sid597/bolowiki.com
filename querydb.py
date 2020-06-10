@@ -4,7 +4,7 @@ from urllib.parse import urlparse
 
 
 class queryDb():
-    c, conn = connection()
+    
 
     def __init__(self, username, c, wikiArticleFullLink=""):
         self.username = username
