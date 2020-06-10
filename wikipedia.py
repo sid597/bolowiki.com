@@ -17,6 +17,7 @@ import urllib.request
 from pprint import pprint
 from collections import deque
 
+
 class WikipediaParser():
 
     def __init__(self, linkToWiki):
@@ -182,7 +183,8 @@ class WikipediaParser():
             else:
                 l = self.parseParas()
                 if l != None:
-                    self.wikiDict[currentTitle] = ''.join(l)
+                    self.wikiDict[currentTitle] = (
+                        "%s. \n" % currentTitle + ''.join(l))
                 ptr = self.ctr
         return self.wikiDict
 
