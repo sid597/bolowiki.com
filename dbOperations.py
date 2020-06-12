@@ -4,8 +4,15 @@ from wikipedia import WikipediaParser
 import json
 from tts import GoogleTextToSpeech
 from pymysql import escape_string as thwart
+from pprint import pformat
+from urllib.parse import unquote
+
 
 def getUserDataFirst(currentUserUsername):
+    return User.query.filter_by(username=currentUserUsername).first()
+
+
+def getUserDataAll(currentUserUsername):
     return User.query.filter_by(username=currentUserUsername).first()
 
 
@@ -17,16 +24,12 @@ def getAllWikiLinksDataFirst(linksNameToSearchWith=''):
     return AllWikiLinks.query.filter_by(wikiLink=linksNameToSearchWith).first()
 
 
-def getUserDataAll(currentUserUsername):
-    return User.query.filter_by(username=currentUserUsername).first()
-
-
 def getWikipediaArticleDataAll(articleNameTosearchWith):
     return WikipediaArticles.query.filter_by(articleName=articleNameTosearchWith).first()
 
 
 def getAllWikiLinksDataAll(linksNameTosearchWith=''):
-    AllWikiLinks.query.filter_by(wikiLink=linksNameTosearchWith).first()
+    return AllWikiLinks.query.filter_by(wikiLink=linksNameTosearchWith).first()
 
 
 def createNewWikipediaArticle(articleNameTosaveWith, articleDictToSave):
@@ -42,29 +45,58 @@ def createNewAllWikiLink(articleNameTosaveWith, articleLocationToSaveWhere, text
     db.session.commit()
 
 
-def createNewUser(username,password,email):
-    newUser = User(username=username,password=password,email=email)
+def createNewUser(username, email, password):
+    app.logger.info("username,email,password are : %s, %s, %s" % (username, email, password))
+    newUser = User(username=username, password=password, email=email)
     db.session.add(newUser)
     db.session.commit()
 
+
+def removeWikiLinkFromUser(username, wikilinkToRemove):
+    user = getUserDataFirst('qwer')
+    uw = user.wikiLinks
+    user.wikiLinks = uw.replace(wikilinkToRemove, '')
+    # print (uw)
+    db.session.commit()
 
 
 class methodsForTTS():
     """Methods used for text-to-speech
     """
 
-    def __init__(self, username, path, fragment):
+    def __init__(self, username, path, fragment=''):
         self.currentUserUsername = username
         self.wikipediaArticlePath = path
-        self.wikipediaArticleFragment = fragment
-        self.nameToSaveWith = str('_'.join(path.split('/')) + '#' + fragment)
+        self.wikipediaArticleFragment = ' '.join(unquote(fragment).split('_'))
+        self.nameToSaveWith = unquote('_'.join(path.split('/')) + '#' + self.wikipediaArticleFragment)
         self.nameWithoutFragment = str('_'.join(path.split('/')))
+
+    def orchestrator(self):
+        app.logger.info("self.currentUserUsername is %s " % self.currentUserUsername)
+        app.logger.info("self.wikipediaArticlePath is %s " % self.wikipediaArticlePath)
+        app.logger.info("self.wikipediaArticleFragment is %s " % self.wikipediaArticleFragment)
+        app.logger.info("self.nameToSaveWith is %s " % self.nameToSaveWith)
+
+        currentUser = getUserDataFirst(self.currentUserUsername)
+        userWikiLinks = currentUser.wikiLinks
+        if self.nameToSaveWith in userWikiLinks:
+            # TODO somehow tell the user to move to that location
+            return
+        else:
+            self.addToUsersWikiLinks()
+            isArticleThere = getAllWikiLinksDataFirst(self.nameToSaveWith)
+            if isArticleThere is None:
+                convertThisArticle = self.getWikipediaArticleFragment()
+                app.logger.info("Article to convert is : %s " % convertThisArticle)
+                return self.textToSpeech(convertThisArticle)
+            else:
+                return isArticleThere.location
 
     def addToUsersWikiLinks(self):
         try:
             user = getUserDataFirst(self.currentUserUsername)
             userWikiLinks = user.wikiLinks
-            app.logger.info(self.nameToSaveWith not in userWikiLinks)
+            app.logger.info("Is name to save with in user wiki links %s" % self.nameToSaveWith not in userWikiLinks)
             if (self.nameToSaveWith not in userWikiLinks) or (userWikiLinks is None):
                 user.wikiLinks += ' ' + self.nameToSaveWith
                 db.session.commit()
@@ -80,9 +112,9 @@ class methodsForTTS():
     def getWikipediaArticleFragment(self):
         try:
             article = getWikipediaArticleDataFirst(self.nameWithoutFragment)
-            app.logger.info("article is : %s" % article)
-
+            app.logger.info(pformat("article is : %s" % article))
             if article is not None:
+                app.logger.info(pformat("article is : %s" % article.articleDict))
                 articleDict = json.loads(article.articleDict)
                 # pprint(articleDict)
                 articleFragment = articleDict[self.wikipediaArticleFragment]
@@ -108,7 +140,7 @@ class methodsForTTS():
         try:
             wikilinkData = getAllWikiLinksDataFirst(self.nameToSaveWith)
             if wikilinkData is None:
-                app.logger.info("articleLocation is none for combined path : %s" % self.nameToSaveWith)
+                app.logger.info("articleLocation is for combined path : %s" % self.nameToSaveWith)
                 mediaLocation = GoogleTextToSpeech(convertThisArticleToSpeech, self.nameToSaveWith)
                 createNewAllWikiLink(self.nameToSaveWith, mediaLocation, convertThisArticleToSpeech)
                 return mediaLocation
@@ -119,9 +151,9 @@ class methodsForTTS():
             return str(e)
 
 
-#################
-#  Test TTS     #
-#################
+###################
+##  Test TTS     ##
+###################
 
 """ If we parse the url then we get following result:
 
@@ -148,4 +180,3 @@ def testTTS():
     print(art)
     newtts.textToSpeech(art)
     newtts.addToUsersWikiLinks()
-
