@@ -5,16 +5,17 @@ from passlib.hash import sha256_crypt
 from pymysql import escape_string as thwart
 from functools import wraps
 # from content_management import Content
-from tts import GoogleTextToSpeech
+
 from urllib.parse import urlparse
-from wikipedia import WikipediaParser
+
 # from markupsafe import escape
 # from querydb import queryDb
 import os
 import gc
-import json
+
 import logging
 from models import *
+from dbOperations import *
 
 app = Flask(__name__)
 logging.basicConfig(filename='error.log', level=logging.DEBUG)
@@ -136,11 +137,7 @@ def register_page():
                 return render_template('register.html', form=form)
 
             else:
-
-                newUser = User(username="%s" % thwart(username), email="%s" % thwart(email),
-                               password="%s" % thwart(password))
-                db.session.add(newUser)
-                db.session.commit()
+                createNewUser(thwart(username), thwart(email), thwart(password))
 
                 flash("Thanks for registering!")
                 gc.collect()
@@ -196,11 +193,11 @@ def getWiki():
         else:
             path = parsedUrl.path
             fragment = parsedUrl.fragment
-            combinedPath = path + "#" + fragment
+            combinedPath = '_'.join(path.split('/')) + "#" + fragment
             app.logger.info("Path and fragment are %s and %s" % (path, fragment))
-            articleLocation = (AllWikiLinks.query.filter_by(wikilink=combinedPath).first()).location
-            app.logger.info("Article location value is : %s" % articleLocation)
-            if articleLocation is not None:
+            article = AllWikiLinks.query.filter_by(wikilink=combinedPath).first()
+            app.logger.info("Article location value is : %s" % article)
+            if article is not None:
                 mediaLocation = textToSpeech(path, fragment)
             else:
                 articleFrag = getWikipediaArticleFragment(path, fragment)
@@ -211,197 +208,76 @@ def getWiki():
         return str(e)
 
 
-def addToUsersWikiLinks(combinedPath, username):
-    try:
-        user = User.query.filter_by(username=username).first()
-        userWikiLinks = user.wikiLinks
-        app.logger.info(str(combinedPath) not in userWikiLinks)
-        if (str(combinedPath) not in userWikiLinks) or (userWikiLinks is None):
-            user.wikiLinks += ' ' + str(combinedPath)
-            app.logger.info("username is %s : links are %s" % (username, user.wikiLinks))
-            db.session.commit()
-        else:
-            app.logger.info('something went wrong')
-
-    except Exception as e:
-        app.logger.info("error in addToUsersWikiLinks : %s" % e)
-        return str(e)
+from pprint import pprint
 
 
-def getWikipediaArticleFragment(articleName, fragment):
-    try:
-        article = WikipediaArticles.query.filter_by(articleName=articleName).first()
-        app.logger.info("article is : %s" % article)
-        if article is not None:
-            articleFrag = json.loads(article.articleDict)[str(fragment)]
-            return articleFrag
-
-        wikiUrl = 'https://en.wikipedia.org' + articleName
-        app.logger.info("wikipedia url is : %s" % wikiUrl)
-        parsedArticle = WikipediaParser(wikiUrl)
-        parsedArticle.instantiate()
-        articleDict = parsedArticle.wikiDict
-        jsonifiedArticle = json.dumps(articleDict)
-        newWikiArticle = WikipediaArticles(articleName=articleName, articleDict=jsonifiedArticle)
-        db.session.add(newWikiArticle)
-        db.session.commit()
-        app.logger.info("Commit successful")
-
-        app.logger.info("Checking if article got commited :  %s" %
-                        (WikipediaArticles.query.filter_by(articleName=articleName).first()).articleDict)
-        return articleDict[fragment]
-    except Exception as e:
-        app.logger.info("error in get wiki : %s" % e)
-        return str(e)
-
-
-def textToSpeech(path, fragment, article=""):
-    try:
-        combinedPath = path + "#" + fragment
-        article = (AllWikiLinks.query.filter_by(wikiLink=combinedPath).first())
-
-        if article.location is None:
-            app.logger.info("articleLocation is : %s" % article.location)
-            mediaLocation = GoogleTextToSpeech(article, combinedPath)
-            newWikiLinkWithFragment = AllWikiLinks(wikiLink=combinedPath, location=mediaLocation, text=article)
-            db.session.add(newWikiLinkWithFragment)
-            db.session.commit()
-            return mediaLocation
-
-        media = AllWikiLinks.query.filter_by(wikiLink=combinedPath).first()
-        return media.location
-
-    except Exception as e:
-        app.logger.info("error in get wiki : %s" % e)
-        return str(e)
-
-
-def convertToSpeech():
-    """ Convert the passed query result to audio files. this method will return the audio file
-        for requested url.
-
-        First I was thinking of adding some computation related to user but I think 1 method should
-        do 1 job only.
-
-        How ?
-        I expect the query to be like : https://en.wikipedia.org/wiki/Anarchy#Description
-        When this query is parsed by urlparse we get :
-            ParseResult(scheme='https', netloc='en.wikipedia.org', path='/wiki/Anarchy',
-                        params='', query='', fragment='Description')
-
-        From this parsed result we can now get the website address and also the
-        wikipedia section( fragment in ParseResult) in which the user is interested in.
-
-    """
-
-    try:
-        app.logger.info("Inside try converttospeech")
-        app.logger.info("request received is %s" % request.form)
-
-        wikiLinkToBeParsed = request.form['textforspeech']
-
-        app.logger.info("wikiLinkToBeParsed is : %s" % type(wikiLinkToBeParsed))
-
-        parsedUrl = urlparse(str(wikiLinkToBeParsed))
-
-        app.logger.info(parsedUrl)
-        flash(wikiLinkToBeParsed)
-        app.logger.info("user passed this link : %s " % wikiLinkToBeParsed)
-
-        if parsedUrl.netloc != 'en.wikipedia.org' or parsedUrl.scheme != 'https':
-            msg = "Pass a valid wikipedia url, for e.g :  https://en.wikipedia.org/wiki/Anarchy"
-            return jsonify({'txt': msg, 'mediaLocation': ''})
-        else:
-            # path means the article user wants to convert
-            path = parsedUrl.path
-            fragment = parsedUrl.fragment
-            combinedPath = path + '#' + fragment
-
-            articleLocation = (AllWikiLinks.query.filter_by(wikilink=combinedPath).first()).location
-
-            if articleLocation is None:
-                # TODO :
-                #  convert to audio,
-                #  return saved location
-                #  update location and article in db
-                article = (AllWikiLinks.query.filter_by(wikilink=combinedPath).first()).text
-                mediaLocation = GoogleTextToSpeech(article, combinedPath)
-                wikiLink = AllWikiLinks.query.filter_by(wikiLink=combinedPath)
-                wikiLink.location = mediaLocation
-                db.session.commit()
-
-
-            else:
-                mediaLocation = AllWikiLinks.query.filter_by(wikiLink=combinedPath).first()
-            return jsonify({'txt': '', 'mediaLocation': mediaLocation.location})
-            # TODO : get the location of saved url, convert to audio, return
-
-
-    except Exception as e:
-        # flash(e)
-        app.logger.info("error in converttospeech :  %s" % e)
-        return str(e)
-
-
+# def convertToSpeech():
+#     """ Convert the passed query result to audio files. this method will return the audio file
+#         for requested url.
 #
-#         contentTitle = escape(contentTitle)
-#         url = request.form['wikiLink']
-#         parsedUrl = urlparse(url)
-#         # If its url to some other website
-#         if parsedUrl.netloc != 'en.wikipedia.org' or parsedUrl.scheme not in ['http', 'https']:
-#             return "website should be en.wikipedia.org"
-#         elif parsedUrl.path == 'wiki/Main_Page':
-#             return "Search for some other path"
+#         First I was thinking of adding some computation related to user but I think 1 method should
+#         do 1 job only.
+#
+#         How ?
+#         I expect the query to be like : https://en.wikipedia.org/wiki/Anarchy#Description
+#         When this query is parsed by urlparse we get :
+#             ParseResult(scheme='https', netloc='en.wikipedia.org', path='/wiki/Anarchy',
+#                         params='', query='', fragment='Description')
+#
+#         From this parsed result we can now get the website address and also the
+#         wikipedia section( fragment in ParseResult) in which the user is interested in.
+#
+#     """
+#
+#     try:
+#         app.logger.info("Inside try converttospeech")
+#         app.logger.info("request received is %s" % request.form)
+#
+#         wikiLinkToBeParsed = request.form['textforspeech']
+#
+#         app.logger.info("wikiLinkToBeParsed is : %s" % type(wikiLinkToBeParsed))
+#
+#         parsedUrl = urlparse(str(wikiLinkToBeParsed))
+#
+#         app.logger.info(parsedUrl)
+#         flash(wikiLinkToBeParsed)
+#         app.logger.info("user passed this link : %s " % wikiLinkToBeParsed)
+#
+#         if parsedUrl.netloc != 'en.wikipedia.org' or parsedUrl.scheme != 'https':
+#             msg = "Pass a valid wikipedia url, for e.g :  https://en.wikipedia.org/wiki/Anarchy"
+#             return jsonify({'txt': msg, 'mediaLocation': ''})
 #         else:
-
-#             wikipediaLink = parsedUrl.scheme + parsedUrl.netloc + parsedUrl.path
-#             if contentTitle is not None:
-#                 # TODO: Query db for wikipediaPage if not present save to db with key as wikipediaLink
-#                 # Get users username
-#                 userId = c.execute("SELECT id  FROM users WHERE username = (%s)",
-#                                    (thwart(request.form["username"]),))
-
-#                 # Get all the wikilinks in user's wikilinks
-#                 userLinks = c.execute("SELECT wikiLinks FROM userWikiLinks WHERE userId=(%s)",
-#                                       (thwart(userId),))
-
-#                 # Check if the link user asked for is in their list ?
-#                 if wikipediaLink in userLinks:
-#                     # TODO : get location where the link audio files are located in server
-#                     return
-#                 else:
-#                     # TODO : get parsed wikipedia page, save that
-#                     return
-
-#                 wikipediaPage = WikipediaParser(wikipediaLink)
-#                 introText = wikipediaPage['Intro']
-
-
-#                 GoogleTextToSpeech(url)
+#             # path means the article user wants to convert
+#             path = parsedUrl.path
+#             fragment = parsedUrl.fragment
+#             combinedPath = path + '#' + fragment
+#
+#             articleLocation = (AllWikiLinks.query.filter_by(wikilink=combinedPath).first()).location
+#
+#             if articleLocation is None:
+#                 # TODO :
+#                 #  convert to audio,
+#                 #  return saved location
+#                 #  update location and article in db
+#                 article = (AllWikiLinks.query.filter_by(wikilink=combinedPath).first()).text
+#                 mediaLocation = GoogleTextToSpeech(article, combinedPath)
+#                 wikiLink = AllWikiLinks.query.filter_by(wikiLink=combinedPath)
+#                 wikiLink.location = mediaLocation
+#                 db.session.commit()
+#
+#
 #             else:
-#                 # TODO : Query db for the Link and get the necessary section
-
-#                 return
-
-#                 # return jsonify({'txt': txt})
-#                 # return jsonify({'txt':"<p>Hello Friend</p>"})
+#                 mediaLocation = AllWikiLinks.query.filter_by(wikiLink=combinedPath).first()
+#             return jsonify({'txt': '', 'mediaLocation': mediaLocation.location})
+#             # TODO : get the location of saved url, convert to audio, return
+#
+#
 #     except Exception as e:
+#         # flash(e)
+#         app.logger.info("error in converttospeech :  %s" % e)
 #         return str(e)
 
-# # #
-# # # @app.route('/return-files/')
-# # # def returnFiles():
-# # #     try:
-# # #         return send_file('/media/icon.svg')
-# # #     except Exception as e:
-# # #         return str(e)
-# # #
-# # #
-# # # @app.route('/get-file/')
-# # # def getFile():
-# # #     return send_file('/media/exam.mp3')
-# # #
-# # #
+
 @app.route('/logout/')
 @login_required
 def logout():
@@ -411,8 +287,6 @@ def logout():
     return redirect(url_for('homepage'))
 
 
-# # #
-# # #
 # ParseResult(scheme='https', netloc='en.wikipedia.org', path='/wiki/Anarchy',
 #                         params='', query='', fragment='Description')
 # Testing for db creating
@@ -424,26 +298,7 @@ def drop():
     db.drop_all()
 
 
-def update(username):
-    user = User.query.filter_by(username=username).first()
-    user.wikiLinks = ' '
-    db.session.commit()
-
-
-def splitCheck(username):
-    user = User.query.filter_by(username=username).first()
-    uw = user.wikiLinks
-    print(uw.split())
-
-
 if __name__ == '__main__':
     with app.app_context():
         # app.run(host="0.0.0.0", debug=True)
-        # createTables()
-        # addToUsersWikiLinks('/wiki/Anarchy#Etymology', 'qwer')
-        # drop()
-        # update('qwer')
-        # splitCheck('qwer')
-        article = getWikipediaArticleFragment('/wiki/Anarchy', '')
-        print(article)
-        print(textToSpeech('/wiki/Anarchy', '', article))
+        testTTS()
