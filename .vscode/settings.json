@@ -14,5 +14,6 @@
     "editor.tokenColorCustomizations": null,
     "terminal.integrated.fontWeight": "500",
     "terminal.integrated.fontWeightBold": "normal",
-    "oneDarkPro.bold": true
+    "oneDarkPro.bold": true,
+    "python.pythonPath": "venv/bin/python"
 }

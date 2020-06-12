@@ -1,4 +1,4 @@
-from MySQLdb import escape_string as thwart
+from pymysql import escape_string as thwart
 from dbconnect import connection
 from urllib.parse import urlparse
 

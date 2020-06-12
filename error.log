@@ -1,0 +1,16 @@
+INFO:__init__:article is : <WikipediaArticles 1>
+INFO:__init__:error in get wiki : 'WikipediaArticles' object is not subscriptable
+INFO:__init__:article is : <WikipediaArticles 1>
+INFO:__init__:article is : <WikipediaArticles 1>
+INFO:__init__:article is : <WikipediaArticles 1>
+INFO:__init__:article is : <WikipediaArticles 1>
+INFO:__init__:article is : <WikipediaArticles 1>
+INFO:__init__:article is : <WikipediaArticles 1>
+INFO:__init__:article is : <WikipediaArticles 1>
+INFO:__init__:article is : <WikipediaArticles 1>
+INFO:__init__:article is : <WikipediaArticles 1>
+INFO:__init__:article is : <WikipediaArticles 1>
+INFO:__init__:article is : <WikipediaArticles 1>
+INFO:__init__:error in get wiki : Entity '<class 'models.AllWikiLinks'>' has no property 'wikilink'
+INFO:__init__:article is : <WikipediaArticles 1>
+INFO:__init__:error in get wiki : 'NoneType' object has no attribute 'location'

@@ -3,6 +3,7 @@
 
 $(function () {
     $('form').on('submit', function (event) {
+    console.log("form submited")
         $.ajax({
             data: {
                 textforspeech: $('#tts').val()

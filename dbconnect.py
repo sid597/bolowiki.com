@@ -1,7 +1,8 @@
-import MySQLdb
+import pymysql
+
 
 def connection():
-    conn = MySQLdb.connect(host="localhost",
+    conn = pymysql.connect(host="localhost",
                            user="root",
                            passwd="cookies!",
                            db="pythonprogramming")

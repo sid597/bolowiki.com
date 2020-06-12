@@ -69,7 +69,6 @@ class WikipediaParser():
             list: A list containing all the article content titles 
         """
         self.wikiSections = self.soup.find(id="toc").find_all('li')
-        return self.wikiSections
         for section in self.wikiSections:
             self.wikiSectionTitles.append(section.find_all('span')[1].string)
         return self.wikiSectionTitles
@@ -106,17 +105,18 @@ class WikipediaParser():
         Returns:
             list: A list containing the introduction paragraphs
         """
-
+        self.getAllContentTags()
         ctr = 0
         for i in self.wikiParas[self.ctr:]:
             tag = i.name
             if tag != 'p':
+                self.wikiDict[''] = ''.join(self.wikiIntro)
                 return ''.join(self.wikiIntro)
             else:
                 self.wikiIntro.append(self.htmlToPlain(i))
                 self.ctr += 1
-        self.wikiDict['Intro'] = ''.join(self.wikiIntro)
-        return ''.join(self.wikiIntro)
+
+
 
     def parseParas(self):
         """Parse the paragraph(i.e content presented in <p> </p> tags)
@@ -176,7 +176,7 @@ class WikipediaParser():
             currentTag = self.wikiParas[ptr]
             if tag in self.h2Orh3:
                 currentTitle = ''.join(
-                    [i.string if i.string != None else '' for i in currentTag.contents])
+                    [i.string if i.string is not None else '' for i in currentTag.contents])
                 # print (currentTitle)
                 self.ctr += 1
                 ptr = self.ctr
@@ -184,7 +184,7 @@ class WikipediaParser():
                 l = self.parseParas()
                 if l != None:
                     self.wikiDict[currentTitle] = (
-                        "%s. \n" % currentTitle + ''.join(l))
+                            "%s. \n" % currentTitle + ''.join(l))
                 ptr = self.ctr
         return self.wikiDict
 

@@ -1,6 +1,8 @@
 from google.cloud import texttospeech
+import os
 
-def GoogleTextToSpeech(textToConvert, saveLocation='/static/converts/'):
+
+def GoogleTextToSpeech(textToConvert, filename):
     # Instantiates a client
     client = texttospeech.TextToSpeechClient()
 
@@ -24,8 +26,17 @@ def GoogleTextToSpeech(textToConvert, saveLocation='/static/converts/'):
         input=synthesis_input, voice=voice, audio_config=audio_config
     )
 
+    saveDirectory = os.getcwd() + "/static/tts/"
     # The response's audio_content is binary.
-    with open("output.mp3", "wb") as out:
+    with open(saveDirectory + filename + ".mp3", "wb") as out:
         # Write the response to the output file.
         out.write(response.audio_content)
         # print('Audio content written to file "output.mp3"')
+    return saveDirectory
+
+
+# Test this by $ python3 tts.py
+# You should see a file helloworld.mp3 in you static directory
+
+if __name__ == '__main__':
+    GoogleTextToSpeech("hello world", 'helloworld')
