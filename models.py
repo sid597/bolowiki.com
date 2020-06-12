@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from flask import current_app as app
 
 db = SQLAlchemy()
 
@@ -12,7 +13,7 @@ class User(db.Model):
     settings = db.Column(db.Text(32500))
     tracking = db.Column(db.Text(32500))
     rank = db.Column(db.String(3))
-    wikiLinks = db.Column(db.Text(32500),default='')
+    wikiLinks = db.Column(db.Text(32500), default='')
 
 
 class WikipediaArticles(db.Model):
@@ -28,3 +29,4 @@ class AllWikiLinks(db.Model):
     wikiLink = db.Column(db.String(200))
     location = db.Column(db.String(500))
     text = db.Column(db.Text(50000))
+
