@@ -9,7 +9,7 @@ class User(db.Model):
     uid = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20))
     password = db.Column(db.String(100))
-    email = db.Column(db.String(50))
+    email = db.Column(db.String(100))
     settings = db.Column(db.Text(32500))
     tracking = db.Column(db.Text(32500))
     rank = db.Column(db.String(3))

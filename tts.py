@@ -4,7 +4,8 @@ import os
 
 
 def GoogleTextToSpeech(textToConvert, nameToSaveWith):
-    print(textToConvert)
+    # print(textToConvert)
+    app.logger.info('Text which is to be converted to speech is %s' % textToConvert)
     # Instantiates a client
     client = texttospeech.TextToSpeechClient()
 
@@ -30,13 +31,13 @@ def GoogleTextToSpeech(textToConvert, nameToSaveWith):
 
     saveDirectory = os.getcwd() + "/static/tts/"
     mediaLocation = saveDirectory + nameToSaveWith + ".mp3"
-    app.logger.info("mediaLocation is going to be : %s "% mediaLocation)
+    app.logger.info("mediaLocation is going to be : %s " % mediaLocation)
     # The response's audio_content is binary.
     with open(mediaLocation, "wb") as out:
         # Write the response to the output file.
         out.write(response.audio_content)
         # print('Audio content written to file "output.mp3"')
-    return mediaLocation
+    return "/static/tts/" + nameToSaveWith
 
 
 # Test this by $ python3 tts.py
