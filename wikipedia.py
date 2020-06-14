@@ -119,7 +119,7 @@ class WikipediaParser():
         for i in self.wikiParas[self.ctr:]:
             tag = i.name
             if tag != 'p':
-                self.wikiDict[''] = ''.join(self.wikiIntro)
+                self.wikiDict[''] = self.title + '. ' + ''.join(self.wikiIntro)
                 return ''.join(self.wikiIntro)
             else:
                 self.wikiIntro.append(self.htmlToPlain(i))
@@ -180,7 +180,7 @@ class WikipediaParser():
     def getTitlesContent(self):
         """Get the contents for each title in wikipedia article
 
-        Complex title's can be like :
+        Corner Case for title can be like :
 
         <h4>
           <span class="mw-headline" id="Mobile_access">
@@ -214,9 +214,11 @@ class WikipediaParser():
                         for j in i.contents:
                             if j.string is not None:
                                 currentTitle += j.string
-
+                # After handling Corner Case for title another case is the edit superscript
+                # which is dealt as follows
+                currentTitle = currentTitle.replace('[edit]', '').strip()
                 # print (currentTitle)
-                print(tag, currentTitle, currentTag.contents)
+                # print(tag, currentTitle.replace('[edit]','').strip(), currentTag.contents)
                 self.ctr += 1
                 ptr = self.ctr
             else:
@@ -294,8 +296,8 @@ def testing():
     print(wikipediaArticleFragment)
     print(nameToSaveWith)
     print(nameWithoutFragment)
-    print(test4.wikiDict[''])
     pprint(test4.wikiSectionTitles)
+    print(test4.wikiDict[wikipediaArticleFragment])
 
 
 if __name__ == '__main__':
