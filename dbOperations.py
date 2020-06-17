@@ -70,12 +70,15 @@ class methodsForTTS():
         self.wikipediaArticleFragment = ' '.join(unquote(fragment).split('_'))
         self.nameToSaveWith = unquote('_'.join(path.split('/')) + '#' + self.wikipediaArticleFragment)
         self.nameWithoutFragment = str('_'.join(path.split('/')))
+        self.filename = unquote('_'.join(path.split('/')) + '__' + self.wikipediaArticleFragment)
 
     def orchestrator(self):
+        app.logger.info("Inside orchestrator")
         app.logger.info("self.currentUserUsername is %s " % self.currentUserUsername)
         app.logger.info("self.wikipediaArticlePath is %s " % self.wikipediaArticlePath)
         app.logger.info("self.wikipediaArticleFragment is %s " % self.wikipediaArticleFragment)
         app.logger.info("self.nameToSaveWith is %s " % self.nameToSaveWith)
+        app.logger.info("self.filename is %s " % self.filename)
 
         currentUser = getUserDataFirst(self.currentUserUsername)
         userWikiLinks = currentUser.wikiLinks
@@ -86,14 +89,17 @@ class methodsForTTS():
             self.addToUsersWikiLinks()
             isArticleThere = getAllWikiLinksDataFirst(self.nameToSaveWith)
             if isArticleThere is None:
+                app.logger.info("Article is none ")
                 convertThisArticle = self.getWikipediaArticleFragment()
                 app.logger.info("Article to convert is : %s " % convertThisArticle)
                 return self.textToSpeech(convertThisArticle)
             else:
+                app.logger.info("Article is there and its location is : %s" % isArticleThere.location)
                 return isArticleThere.location
 
     def addToUsersWikiLinks(self):
         try:
+            app.logger.info("Inside addToUsersWikiLinks")
             user = getUserDataFirst(self.currentUserUsername)
             userWikiLinks = user.wikiLinks
             app.logger.info("Is name to save with in user wiki links %s" % self.nameToSaveWith not in userWikiLinks)
@@ -103,7 +109,7 @@ class methodsForTTS():
                 app.logger.info("username is %s : links are %s" % (self.currentUserUsername, user.wikiLinks))
 
             else:
-                app.logger.info('something went wrong')
+                app.logger.info("link is already there in user's wiki link BUT HOW CAN THIS BE ? ")
 
         except Exception as e:
             app.logger.info("error in addToUsersWikiLinks : %s" % e)
@@ -111,6 +117,7 @@ class methodsForTTS():
 
     def getWikipediaArticleFragment(self):
         try:
+            app.logger.info("Inside getWikipediaArticleFragment")
             article = getWikipediaArticleDataFirst(self.nameWithoutFragment)
             app.logger.info(pformat("article is : %s" % article))
             if article is not None:
@@ -118,6 +125,7 @@ class methodsForTTS():
                 articleDict = json.loads(article.articleDict)
                 # pprint(articleDict)
                 articleFragment = articleDict[self.wikipediaArticleFragment]
+                app.logger.info("Got article fragment ")
                 return ''.join(articleFragment)
             wikiUrl = 'https://en.wikipedia.org' + self.wikipediaArticlePath
             app.logger.info("wikipedia url is : %s" % wikiUrl)
@@ -138,10 +146,11 @@ class methodsForTTS():
 
     def textToSpeech(self, convertThisArticleToSpeech):
         try:
+            app.logger.info("Inside textToSpeech")
             wikilinkData = getAllWikiLinksDataFirst(self.nameToSaveWith)
             if wikilinkData is None:
-                app.logger.info("articleLocation is for combined path : %s" % self.nameToSaveWith)
-                mediaLocation = GoogleTextToSpeech(convertThisArticleToSpeech, self.nameToSaveWith)
+                app.logger.info("articleLocation is for combined path : %s" % self.filename)
+                mediaLocation = GoogleTextToSpeech(convertThisArticleToSpeech, self.filename)
                 createNewAllWikiLink(self.nameToSaveWith, mediaLocation, convertThisArticleToSpeech)
                 return mediaLocation
             media = getAllWikiLinksDataFirst(self.nameToSaveWith)
