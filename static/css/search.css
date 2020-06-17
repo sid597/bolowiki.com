@@ -8,8 +8,8 @@
   display: flex;
   box-shadow: none;
   z-index: 3;
-  height: 44px;
-  width: 482px;
+  height: 51px;
+  width: 484px;
   background: rgb(255, 255, 255);
   border-width: 1px;
   border-style: solid;
@@ -52,7 +52,7 @@
 }
 #searchInputBox {
   font-family: Alegreya;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   font-weight: 400;
   background-color: transparent;
   color: rgba(0, 0, 0, 0.87);
@@ -81,7 +81,7 @@
   display: flex;
   cursor: pointer;
   align-items: center;
-  width: 24px;
+  width: 44px;
   line-height: 44px;
   flex: 1 0 auto;
   border-width: 0px;
@@ -107,7 +107,7 @@
   box-shadow: rgba(32, 33, 36, 0.28) 0px 4px 6px 0px;
   background: rgb(255, 255, 255);
   margin: 0px;
-  padding: 0px 0px 4px;
+  padding: 0px 41px 25px;
   border-width: 0px;
   border-style: initial;
   border-color: initial;
@@ -115,7 +115,7 @@
   border-radius: 0px 0px 24px 24px;
   overflow: hidden;
 }
-ul {
+/* ul {
   display: block;
   list-style-type: disc;
   margin-block-start: 1em;
@@ -123,7 +123,7 @@ ul {
   margin-inline-start: 0px;
   margin-inline-end: 0px;
   padding-inline-start: 40px;
-}
+} */
 
 .listitem {
   list-style: none;
