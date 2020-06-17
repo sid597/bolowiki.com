@@ -1,0 +1,136 @@
+#mainDiv {
+  position: relative;
+  padding-top: 6px;
+  width: 484px;
+  margin: 0px auto;
+}
+#searchMainDiv {
+  display: flex;
+  box-shadow: none;
+  z-index: 3;
+  height: 44px;
+  width: 482px;
+  background: rgb(255, 255, 255);
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(223, 225, 229);
+  border-image: initial;
+  border-radius: 24px;
+  margin: 0px auto;
+}
+#searchDiv {
+  display: flex;
+  flex: 1 1 0%;
+  padding: 5px 8px 0px 14px;
+}
+#searchSVG {
+  display: flex;
+  align-items: center;
+  padding-right: 13px;
+  margin-top: -5px;
+}
+#searchSVGIcon {
+  margin-top: 3px;
+  color: rgb(154, 160, 166);
+  display: inline-block;
+  fill: currentcolor;
+  height: 24px;
+  line-height: 24px;
+  position: relative;
+  width: 24px;
+}
+#searchBox {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1 1 0%;
+}
+#searchBar {
+  color: transparent;
+  white-space: pre;
+  height: 34px;
+  flex: 1 1 100%;
+}
+#searchInputBox {
+  font-family: Alegreya;
+  font-size: 1.2rem;
+  font-weight: 400;
+  background-color: transparent;
+  color: rgba(0, 0, 0, 0.87);
+  overflow-wrap: break-word;
+  display: flex;
+  -webkit-tap-highlight-color: transparent;
+  height: 34px;
+  border-width: initial;
+  border-style: none;
+  border-color: initial;
+  border-image: initial;
+  margin: -37px 0px 0px;
+  padding: 0px;
+  outline: none;
+  flex: 1 1 100%;
+}
+
+#voiceSearch {
+  display: flex;
+  margin-top: -5px;
+  align-items: stretch;
+  flex-direction: row;
+  flex: 0 0 auto;
+}
+#voiceSearchDiv {
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  width: 24px;
+  line-height: 44px;
+  flex: 1 0 auto;
+  border-width: 0px;
+  border-style: initial;
+  border-color: initial;
+  border-image: initial;
+  background: transparent;
+  outline: none;
+  padding: 0px 8px;
+}
+#voiceSearchSVGIcon {
+  height: 38px;
+  width: 34px;
+  vertical-align: middle;
+}
+#searchSuggestion {
+    font-family: Alegreya;
+  font-size: 1.12rem;
+  font-weight: 400;
+  display: none;
+  flex-direction: column;
+  list-style-type: none;
+  box-shadow: rgba(32, 33, 36, 0.28) 0px 4px 6px 0px;
+  background: rgb(255, 255, 255);
+  margin: 0px;
+  padding: 0px 0px 4px;
+  border-width: 0px;
+  border-style: initial;
+  border-color: initial;
+  border-image: initial;
+  border-radius: 0px 0px 24px 24px;
+  overflow: hidden;
+}
+ul {
+  display: block;
+  list-style-type: disc;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  padding-inline-start: 40px;
+}
+
+.listitem {
+  list-style: none;
+  padding: 0.4em;
+}
+
+.resultLink {
+  color: inherit;
+  text-decoration: none;
+}
