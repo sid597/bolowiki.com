@@ -4,6 +4,7 @@ import os
 
 
 def GoogleTextToSpeech(textToConvert, nameToSaveWith):
+    app.logger.info("Inside GoogleTextToSpeech")
     # print(textToConvert)
     app.logger.info('Text which is to be converted to speech is %s' % textToConvert)
     # Instantiates a client
@@ -37,7 +38,7 @@ def GoogleTextToSpeech(textToConvert, nameToSaveWith):
         # Write the response to the output file.
         out.write(response.audio_content)
         # print('Audio content written to file "output.mp3"')
-    return "/static/tts/" + nameToSaveWith
+    return "../static/tts/" + nameToSaveWith
 
 
 # Test this by $ python3 tts.py
