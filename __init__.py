@@ -7,7 +7,6 @@ from urllib.parse import urlparse
 import os
 import gc
 import logging
-from models import *
 from dbOperations import *
 from pprint import pprint
 
@@ -38,12 +37,12 @@ def login_required(f):
 
 @app.route('/')
 def homepage():
-    app.logger.info("hello there")
     try:
+        app.logger.info("Inside homepage")
         if 'logged_in' in session:
             return redirect(url_for('dashboard'))
         else:
-            return render_template("main.html")
+            return render_template("search.html")
     except Exception as e:
         return str(e)
 
@@ -52,12 +51,14 @@ def homepage():
 @app.route('/dashboard/')
 @login_required
 def dashboard():
+    app.logger.info("Inside dashboard")
     return render_template("dashboard.html")
 
 
 
 @app.errorhandler(404)
 def page_not_found(e):
+    app.logger.info("Inside page_not_found")
     return render_template('404.html')
 
 
@@ -65,6 +66,7 @@ def page_not_found(e):
 def login():
     error = ''
     try:
+        app.logger.info("Inside login")
         if 'logged_in' in session:
             return redirect(url_for('dashboard'))
         elif request.method == "POST":
@@ -105,10 +107,10 @@ class RegistrationForm(Form):
     ])
     confirm = PasswordField('Repeat Password')
 
-
 @app.route('/register/', methods=["GET", "POST"])
 def register_page():
     try:
+        app.logger.info("Inside register_page  ")
         form = RegistrationForm(request.form)
         app.logger.info("username of user ---> %s" % form.username.data)
         if 'logged_in' in session:
@@ -164,7 +166,7 @@ def getWiki():
                     params='', query='', fragment='Etymology')
     """
     try:
-        app.logger.info("Inside try converttospeech")
+        app.logger.info("Inside getWiki")
         app.logger.info("request received is %s" % request.form)
 
         wikiLinkToBeParsed = str(request.form['textforspeech']).strip()
@@ -175,15 +177,15 @@ def getWiki():
         if parsedUrl.netloc != 'en.wikipedia.org' or parsedUrl.scheme != 'https':
 
             msg = "Pass a valid wikipedia url, for e.g :  https://en.wikipedia.org/wiki/Anarchy"
-            return jsonify({'txt': msg, 'mediaLocation': ''})
+            return jsonify({'txt': msg, 'mediaLocation': '',"success": False,})
         else:
             path = parsedUrl.path
             fragment = parsedUrl.fragment
             username = session['username']
 
             newTTS = methodsForTTS(username, path, fragment)
-            mediaLocation = newTTS.orchestrator()
-            return jsonify({'mediaLocation': mediaLocation, 'txt': 'Congrats !'})
+            mediaLocation = newTTS.orchestrator() + '.mp3'
+            return jsonify({'mediaLocation': mediaLocation, 'txt': 'Congrats !',"success": True,})
     except Exception as e:
         app.logger.info("error in get wiki : %s" % e)
         return str(e)
@@ -192,6 +194,7 @@ def getWiki():
 @app.route('/logout/')
 @login_required
 def logout():
+    app.logger.info("Inside logout")
     session.clear()
     flash("You have been logged out!")
     gc.collect()
@@ -214,13 +217,14 @@ def createTables():
 def drop():
     db.drop_all()
 
-
-
+def dc():
+    drop()
+    createTables()
+    app.run(host="0.0.0.0", debug=True)
 
 if __name__ == '__main__':
     with app.app_context():
         app.run(host="0.0.0.0", debug=True)
         # testTTS()
-        # drop()
-        # createTables()
+        # dc()
         # print(removeWikiLinkFromUser('qwer','_wiki_Anarchy#French Revolution (1789–1799)'))
