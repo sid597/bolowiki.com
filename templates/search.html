@@ -6,9 +6,9 @@
     href="https://fonts.googleapis.com/css?family=Tangerine"
   />
 
-   
-  <link rel="stylesheet" href={{url_for(filename="search.css")}} />
-  <script src={{url_for(filename='search.js')}}></script>
+  
+  <link rel="stylesheet" href={{url_for('static', filename="css/search.css")}} />
+  <script src={{url_for('static', filename='js/search.js')}}></script>
 </head>
 <body>
   <div id="mainDiv">
@@ -81,9 +81,9 @@
         <div id="searchSuggestionList">
 
         </div>
-        <div id="searchSuggestionButton">
+        <!-- <div id="searchSuggestionButton">
             <button type="button" class="btn btn-primary">Primary</button>
-        </div>
+        </div> -->
     </div>
   </div>
 </body>
