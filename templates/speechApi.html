@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+      integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+      crossorigin="anonymous"
+    />
+
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="container h-100 my-auto">
+      <button
+        type="button"
+        onclick="log()"
+        class="align-middle btn btn-primary"
+      >
+        Primary
+      </button>
+    </div>
+  </body>
+
+  <!-- ==================================================================================
+================================================================================== -->
+
+  <script>
+    if (!("webkitSpeechRecognition" in window)) {
+      upgrade();
+    } else {
+      var recognition = new webkitSpeechRecognition();
+      // recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = "en-US";
+      console.log(recognition);
+
+      recognition.onstart = () => {
+        console.log("recognition started");
+      };
+      recognition.onresult = (e) => {
+        console.log(`recognition complete here is your result ${e.result}`);
+        console.log(`here is your event ${e}`);
+      };
+
+      recognition.onerror = (e) => {
+        console.log(` error occured : ${e.error}`);
+      };
+      recognition.onend = (e) => {
+        console.log("ended");
+      };
+    }
+
+    function log() {
+      console.log("clicked");
+      recognition.start();
+    }
+  </script>
+
+  <!-- ==================================================================================
+================================================================================== -->
+</html>
