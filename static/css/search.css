@@ -2,7 +2,7 @@
   position: relative;
   padding-top: 6px;
   width: 484px;
-  margin: 0px auto;
+  margin: 40px auto;
 }
 #searchMainDiv {
   display: flex;
@@ -51,7 +51,7 @@
   flex: 1 1 100%;
 }
 #searchInputBox {
-  font-family: Alegreya;
+  font-family: roboto;
   font-size: 1.3rem;
   font-weight: 400;
   background-color: transparent;
@@ -98,7 +98,7 @@
   vertical-align: middle;
 }
 #searchSuggestion {
-    font-family: Alegreya;
+    font-family: roboto;
   font-size: 1.12rem;
   font-weight: 400;
   display: none;
@@ -133,4 +133,16 @@
 .resultLink {
   color: inherit;
   text-decoration: none;
+}
+
+@media (max-width:475px){
+#mainDiv,#searchMainDiv{
+  width:300px;
+  margin:0 auto;
+}
+
+#searchInputBox{
+  width: 200px;
+}
+
 }
