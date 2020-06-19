@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded',() =>{
 
             for (var i = 0; i < 10; i++) {
                  
-                l.push(`<a href=${data[3][i]}> <li class="list-group-item">${data[1][i]}</li></a>`)
+                l.push(`<a href=${data[3][i]}> <li class="listitem">${data[1][i]}</li></a>`)
                 // document.querySelector('.suggestions').append(ii)
             };
             l.push('</ul>')
@@ -47,11 +47,7 @@ document.addEventListener('DOMContentLoaded',() =>{
     });
 
 
-//     wi = new XMLHttpRequest;
-// wi.open('GET','https://en.wikipedia.org/w/api.php?action=opensearch&format=json&formatversion=2&search=z&namespace=0&limit=10')
-// wi.send()
-// wi.responseText
-
+ 
 
 
 

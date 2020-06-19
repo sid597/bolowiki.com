@@ -1,5 +1,5 @@
-from flask import Flask, render_template, url_for, redirect, flash, request, session, send_file, jsonify
-from wtforms import Form, BooleanField, validators, PasswordField, TextField
+from flask import Flask, render_template, url_for, redirect, flash, request, session, jsonify
+from wtforms import Form, validators, PasswordField, TextField
 from passlib.hash import sha256_crypt
 from pymysql import escape_string as thwart
 from functools import wraps
@@ -7,12 +7,11 @@ from urllib.parse import urlparse
 import os
 import gc
 import logging
-from dbOperations import *
-from pprint import pprint
+from logic.dbOperations import *
 
-
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates' )
 logging.basicConfig(filename='error.log', level=logging.DEBUG)
+app.config['EXPLAIN_TEMPLATE_LOADING']= True
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
@@ -40,9 +39,11 @@ def homepage():
     try:
         app.logger.info("Inside homepage")
         if 'logged_in' in session:
+            app.logger.info("User is logged in")
             return redirect(url_for('dashboard'))
         else:
-            return render_template("search.html")
+            app.logger.info("User is NOT logged in")
+            return render_template('layout/main.html')
     except Exception as e:
         return str(e)
 
@@ -52,14 +53,14 @@ def homepage():
 @login_required
 def dashboard():
     app.logger.info("Inside dashboard")
-    return render_template("dashboard.html")
+    return render_template("/layout/dashboard.html")
 
 
 
 @app.errorhandler(404)
 def page_not_found(e):
     app.logger.info("Inside page_not_found")
-    return render_template('404.html')
+    return render_template('helper_templates/404.html')
 
 
 @app.route('/login/', methods=['GET', 'POST'])
@@ -89,13 +90,13 @@ def login():
                 error = "Invalid credentials, try again."
 
         gc.collect()
-        return render_template("login.html", error=error)
+        return render_template("user_Management/login.html", error=error)
 
     except Exception as e:
         # flash(e)
         app.logger.error("Error occured ----> %s" % e)
         error = "Invalid credentials, try again."
-        return render_template("login.html", error=error)
+        return render_template("user_Management/login.html", error=error)
 
 
 class RegistrationForm(Form):
@@ -125,7 +126,7 @@ def register_page():
             app.logger.info("value of foundUser is  %s" % foundUser)
             if foundUser is not None:
                 flash("That username is already taken, please choose another")
-                return render_template('register.html', form=form)
+                return render_template('user_Management/register.html', form=form)
 
             else:
 
@@ -138,7 +139,7 @@ def register_page():
 
                 return redirect(url_for('dashboard'))
 
-        return render_template("register.html", form=form)
+        return render_template("user_Management/register.html", form=form)
 
     except Exception as e:
         return str(e)
@@ -169,7 +170,7 @@ def getWiki():
         app.logger.info("Inside getWiki")
         app.logger.info("request received is %s" % request.form)
 
-        wikiLinkToBeParsed = str(request.form['textforspeech']).strip()
+        wikiLinkToBeParsed = str(request.form['wikipediaLink']).strip()
         app.logger.info(
             "wikiLink to be parsed is : %s and its type is %s" % (wikiLinkToBeParsed, type(wikiLinkToBeParsed)))
         parsedUrl = urlparse(wikiLinkToBeParsed)

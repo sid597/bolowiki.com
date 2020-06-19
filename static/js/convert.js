@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const data = new FormData();
 
-        data.append('textforspeech', wikiLink);
+        data.append('wikipediaLink', wikiLink);
 
         request.send(data);
         return false;

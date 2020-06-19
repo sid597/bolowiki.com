@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // console.log(`${searchText}-->`, matchText, '||', unmatchedText)
                     if (matchText) {
                         if (unmatchedText) {
-                            l.push(`<a class="resultLink" href=${textLink}> <li class="listitem"><b>${matchText}</b>${unmatchedText}</li></a>`)
+                            l.push(`<a class="resultLink" href=${textLink}> <li class="listitem"><span style="font-weight:600">${matchText}</span><span>${unmatchedText}</span></li></a>`)
                         }
                         else {
                             l.push(`<a class="resultLink" href=${textLink}> <li class="listitem"><b>${matchText}</b></li></a>`)
@@ -113,8 +113,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     searchBox.addEventListener('keyup', e => {
         focusedStyle()
-        if (e.target.value) { 
-            getWikipediaresponse(e.target.value) 
+        searchQuery = (e.target.value).trim()
+        if (searchQuery) { 
+            getWikipediaresponse(searchQuery) 
         }
     });
 
@@ -128,3 +129,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
