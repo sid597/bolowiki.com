@@ -1,4 +1,4 @@
-{% extends "header.html" %}
+{% extends "layout/header.html"  %}
 
 {% block body %}
 
@@ -6,14 +6,13 @@
 	<div class = "container">
 		<h4>Register</h4>
 		<br>
-		{% from "_formhelpers.html" import render_field %}
+		{% from "user_Management/_formhelpers.html" import render_field %}
 		<form method=post action="/register/">
 			<dl>
 				{{render_field(form.username)}}
 				{{render_field(form.email)}}
 				{{render_field(form.password)}}
 				{{render_field(form.confirm)}}
-
 			</dl>
 			<p><input type=submit value=Register></p>
 		</form>

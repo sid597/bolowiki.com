@@ -1,9 +1,8 @@
 from models import *
 from flask import current_app as app
-from wikipedia import WikipediaParser
+from logic.wikipedia import WikipediaParser
 import json
-from tts import GoogleTextToSpeech
-from pymysql import escape_string as thwart
+from logic.tts import GoogleTextToSpeech
 from pprint import pformat
 from urllib.parse import unquote
 

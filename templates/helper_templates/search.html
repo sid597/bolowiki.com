@@ -1,17 +1,12 @@
-{% extends "header.html" %}
-{% block body %}
-<head>
-  <link
-    rel="stylesheet"
-    href="https://fonts.googleapis.com/css?family=Tangerine"
-  />
 
-  
+<head>
+ 
   <link rel="stylesheet" href={{url_for('static', filename="css/search.css")}} />
   <script src={{url_for('static', filename='js/search.js')}}></script>
 </head>
-<body>
-  <div id="mainDiv">
+ 
+  <form action="" method="POST"></form>
+  <div class="mt" id="mainDiv">
     <div id="searchMainDiv">
       <div id="searchDiv">
         <div id="searchSVG">
@@ -86,5 +81,4 @@
         </div> -->
     </div>
   </div>
-</body>
-{%endblock  %}
+ 

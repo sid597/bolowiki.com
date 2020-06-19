@@ -99,7 +99,7 @@
 }
 #searchSuggestion {
     font-family: roboto;
-  font-size: 1.12rem;
+  font-size: 1.22rem;
   font-weight: 400;
   display: none;
   flex-direction: column;
@@ -127,7 +127,7 @@
 
 .listitem {
   list-style: none;
-  padding: 0.4em;
+  padding: 0.3em;
 }
 
 .resultLink {
