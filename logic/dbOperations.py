@@ -81,20 +81,23 @@ class methodsForTTS():
 
         currentUser = getUserDataFirst(self.currentUserUsername)
         userWikiLinks = currentUser.wikiLinks
+        isArticleThere = getAllWikiLinksDataFirst(self.nameToSaveWith)
+        convertThisArticle, articleContentsList = self.getWikipediaArticleFragment()
         if self.nameToSaveWith in userWikiLinks:
             # TODO somehow tell the user to move to that location
-            return
+            # app.logger.info("Article data %s" %(isArticleThere.location, convertThisArticle, articleContentsList))
+            return isArticleThere.location, convertThisArticle, articleContentsList
         else:
             self.addToUsersWikiLinks()
-            isArticleThere = getAllWikiLinksDataFirst(self.nameToSaveWith)
+            
             if isArticleThere is None:
                 app.logger.info("Article is none ")
-                convertThisArticle = self.getWikipediaArticleFragment()
+                
                 app.logger.info("Article to convert is : %s " % convertThisArticle)
-                return self.textToSpeech(convertThisArticle)
+                return self.textToSpeech(convertThisArticle),convertThisArticle,articleContentsList
             else:
                 app.logger.info("Article is there and its location is : %s" % isArticleThere.location)
-                return isArticleThere.location
+                return isArticleThere.location, convertThisArticle, articleContentsList
 
     def addToUsersWikiLinks(self):
         try:
@@ -120,12 +123,15 @@ class methodsForTTS():
             article = getWikipediaArticleDataFirst(self.nameWithoutFragment)
             app.logger.info(pformat("article is : %s" % article))
             if article is not None:
-                app.logger.info(pformat("article is : %s" % article.articleDict))
+                # app.logger.info(pformat("article is : %s" % article.articleDict))
                 articleDict = json.loads(article.articleDict)
                 # pprint(articleDict)
                 articleFragment = articleDict[self.wikipediaArticleFragment]
                 app.logger.info("Got article fragment ")
-                return ''.join(articleFragment)
+                articleContents = [i for i in articleDict]
+                app.logger.info("article contents list is %s" %articleContents)
+                
+                return ''.join(articleFragment),articleContents
             wikiUrl = 'https://en.wikipedia.org' + self.wikipediaArticlePath
             app.logger.info("wikipedia url is : %s" % wikiUrl)
             parsedArticle = WikipediaParser(wikiUrl)
@@ -138,7 +144,9 @@ class methodsForTTS():
             app.logger.info("Checking if article got commited :  %s" %
                             (getWikipediaArticleDataFirst(self.nameWithoutFragment)).articleDict)
             articleFragment = articleDict[self.wikipediaArticleFragment]
-            return ''.join(articleFragment)
+            articleContents = [i for i in articleDict]
+            app.logger.info("article contents list is %s" %articleContents)
+            return ''.join(articleFragment),articleContents
         except Exception as e:
             app.logger.info("error in get wiki : %s" % e)
             return str(e)
