@@ -1,31 +1,21 @@
-<!-- Button trigger modal -->
-<button
-  type="button"
-  class="btn btn-primary"
-  data-toggle="modal"
-  data-target="#exampleModal"
->
-  Launch demo modal
-</button>
 
-<!-- Modal -->
 <div
-  class="modal fade"
-  id="exampleModal"
+  class="modal fade "
+  id="audioModal"
   tabindex="-1"
-  aria-labelledby="exampleModalLabel"
+  aria-labelledby="audioModalLabel"
   aria-hidden="true"
 >
   <div class="modal-dialog modal-lg">
-    <div class="modal-content">
+    <div class="modal-content" id='audioModalContent'>
       <div
         class="modal-header"
         style="align-items: center; background-color: #eef3f5;"
       >
-        <audio controls style="width: 100%;">
-          <source src="" type="audio/mpeg" />
-          Your browser does not support the audio element.
-        </audio>
+      <div id="audioModalHeader" style="width: 100%;">
+
+      </div>
+        
         <button
           type="button"
           class="close"
@@ -35,27 +25,11 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body">
-        Many unincorporated communities are also recognized as acceptable place
-        names for use in mailing addresses by the United States Postal Service
-        (USPS) (indeed, some have their own post offices), and the United States
-        Census Bureau uses the names of some widely recognized unincorporated
-        communities for its census-designated places (CDPs) for which it
-        tabulates census data. There are instances of unincorporated areas
-        having a mailing address indicating the name of an incorporated
-        city,[citation needed] as well as those where residents of one
-        incorporated city have mailing addresses indicating another incorporated
-        city. Mailing addresses do not necessarily change whether an area
-        becomes a part of an incorporated place, changes to another incorporated
-        place, or de-incorporates. For example, places in Kingwood, previously
-        unincorporated, retained "Kingwood, TX" mailing addresses after the 1996
-        annexation of Kingwood into the City of Houston. The Houston city
-        government stated on its website that "The U.S. Postal Service
-        establishes ZIP codes and mailing addresses in order to maximize the
-        efficiency of their system, not to recognize jurisdictional
-        boundaries."[15]
+      <div class="modal-body" id="audioModalBody">
+
       </div>
       <div
+      id="audioModalFooter"
         class="modal-footer"
         style="
           justify-content: flex-start;
@@ -63,13 +37,8 @@
           background-color: #eef3f5;
         "
       >
-        <a
-          href="https://en.wikipedia.org/wiki/Unincorporated_area#USGS_definition_of_%22populated_place%22"
-          >https://en.wikipedia.org/wiki/Unincorporated_area#USGS_definition_of_%22populated_place%22</a
-        >
+        
       </div>
     </div>
   </div>
 </div>
-
-<style></style>
