@@ -23,9 +23,11 @@ from flask import current_app as app
 class WikipediaParser():
 
     def __init__(self, linkToWiki):
+        
         self.wikiLink = urllib.request.urlopen(linkToWiki).read()
         self.soup = bs.BeautifulSoup(self.wikiLink, 'lxml')
-        self.title = self.soup.find(id="firstHeading").string
+        # Get the strings inside title tag, the tiltle always includes "- wikipedia" so remove that and join
+        self.title = ' '.join(str(self.soup.find("title").string).split()[:-2])  
         self.body = self.soup.find('div', class_="mw-parser-output").children
         self.wikiSections = None
         self.wikiSectionTitles = []
@@ -160,7 +162,7 @@ class WikipediaParser():
         """
         app.logger.info("Inside htmlToPlain")
         l = []
-        validInsidePara = ['li', 'dd', 'i', 'a']
+        validInsidePara = ['li', 'dd', 'i', 'a', 'b']
         paraContent = p.contents
         for i in paraContent:
             tag = i.name
@@ -235,71 +237,3 @@ class WikipediaParser():
         self.getAllContentTags()
         self.getIntroParas()
         self.getTitlesContent()
-
-
-def testing():
-    url1 = "https://en.wikipedia.org/wiki/Anarchy#French_Revolution_(1789%E2%80%931799)"
-    url2 = "https://en.wikipedia.org/wiki/Anarchy#Immanuel_Kant"
-    url3 = "https://en.wikipedia.org/wiki/The_Devil%27s_Whore#Cast"
-    url4 = "https://en.wikipedia.org/wiki/Wikipedia"
-    test1 = WikipediaParser(url1)
-    test1.instantiate()
-    purl = urlparse(url1)
-    wikipediaArticlePath = purl.path
-    wikipediaArticleFragment = ' '.join(unquote(purl.fragment).split('_'))
-    nameToSaveWith = unquote(str('_'.join(purl.path.split('/')) + '#' + purl.fragment))
-    nameWithoutFragment = str('_'.join(purl.path.split('/')))
-    print(purl)
-    print(wikipediaArticlePath)
-    print(wikipediaArticleFragment)
-    print(nameToSaveWith)
-    print(nameWithoutFragment)
-    print(test1.wikiDict[wikipediaArticleFragment])
-    print('_________________________________________________________________________________________________________-')
-    test2 = WikipediaParser(url2)
-    test2.instantiate()
-    purl = urlparse(url2)
-    wikipediaArticlePath = purl.path
-    wikipediaArticleFragment = ' '.join(unquote(purl.fragment).split('_'))
-    nameToSaveWith = str('_'.join(purl.path.split('/')) + '#' + wikipediaArticleFragment)
-    nameWithoutFragment = str('_'.join(purl.path.split('/')))
-    print(purl)
-    print(wikipediaArticlePath)
-    print(wikipediaArticleFragment)
-    print(nameToSaveWith)
-    print(nameWithoutFragment)
-    print(test2.wikiDict[wikipediaArticleFragment])
-    print('_________________________________________________________________________________________________________-')
-    test3 = WikipediaParser(url3)
-    test3.instantiate()
-    purl = urlparse(url3)
-    wikipediaArticlePath = purl.path
-    wikipediaArticleFragment = ' '.join(unquote(purl.fragment).split('_'))
-    nameToSaveWith = unquote(('_'.join(purl.path.split('/')) + '#' + wikipediaArticleFragment))
-    nameWithoutFragment = str('_'.join(purl.path.split('/')))
-    print(purl)
-    print(wikipediaArticlePath)
-    print(wikipediaArticleFragment)
-    print(nameToSaveWith)
-    print(nameWithoutFragment)
-    print(test3.wikiDict[wikipediaArticleFragment])
-    print('_________________________________________________________________________________________________________-')
-    test4 = WikipediaParser(url4)
-    test4.instantiate()
-    purl = urlparse(url4)
-    wikipediaArticlePath = purl.path
-    wikipediaArticleFragment = ' '.join(unquote(purl.fragment).split('_'))
-    nameToSaveWith = unquote(('_'.join(purl.path.split('/')) + '#' + wikipediaArticleFragment))
-    nameWithoutFragment = str('_'.join(purl.path.split('/')))
-    print(purl)
-    print(wikipediaArticlePath)
-    print(wikipediaArticleFragment)
-    print(nameToSaveWith)
-    print(nameWithoutFragment)
-    pprint(test4.wikiSectionTitles)
-    print(test4.wikiDict[wikipediaArticleFragment])
-
-
-if __name__ == '__main__':
-    with app.app_context():
-        testing()
