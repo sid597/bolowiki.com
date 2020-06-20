@@ -1,14 +1,82 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    var queryTopResultLink = null;
+    var queryTopResultText = null;
     searchMainDiv = document.querySelector('#searchMainDiv')
     searchBox = document.querySelector('#searchInputBox')
     searchSuggestion = document.querySelector('#searchSuggestion')
-    searchSuggestionList =document.querySelector('#searchSuggestionList')
+    searchSuggestionList = document.querySelector('#searchSuggestionList')
     mainDiv = document.querySelector('#mainDiv')
+    audioModalContentChildren = document.querySelector('#audioModalContent').children
+    audioModalHeader = document.querySelector('#audioModalHeader')
+    wikipediaAccordian = document.querySelector('#wikipediaAccordian')
 
+    function showAudioModal(mediaLocation, articleText) {
+        console.log(`media location is : ${mediaLocation} and articleText is ${articleText}`)
+        audioModalBody = audioModalContentChildren[1]
+        audioModalFooter = audioModalContentChildren[2]
+        console.log(audioModalHeader, audioModalBody, audioModalFooter)
+        audioModalHeader.innerHTML = `<audio controls style="width: 100%;"><source src="${mediaLocation}" type="audio/mpeg" />Your browser does not support the audio element.</audio>`
+        audioModalBody.innerHTML = articleText
+        audioModalFooter.innerHTML = `<a href="${queryTopResultLink}">${queryTopResultLink}</a>`
+        var myModal = new bootstrap.Modal(document.getElementById('audioModal'))
+        myModal.toggle()
+
+
+    }
+    function createNewAccordianCard(articleTitle, articleContents){
+        let newCard = `<div class="card">
+        <div class="card-header" id="${articleTitle}Wiki">
+          <h2 class="mb-0">
+            <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#${articleTitle}collapse" aria-expanded="true" aria-controls="collapseOne">
+            ${articleTitle}
+            </button>
+          </h2>
+        </div>
+    
+        <div id="${articleTitle}collapse" class="collapse show" aria-labelledby="${articleTitle}Wiki" data-parent="#wikipediaAccordian">
+          <div class="card-body">
+            ${articleContents}
+          </div>
+        </div>
+      </div>`
+      wikipediaAccordian.insertAdjacentHTML('afterbegin', newCard)
+      console.log(newCard)
+      
+    }
+
+
+    function getAudioFileData(functionToHandleTheResponse) {
+        console.log('inside getAudioFileData')
+        console.log(`function to handle response is ${functionToHandleTheResponse}`)
+        request = new XMLHttpRequest();
+        request.open('POST', '/converttospeech/')
+        request.onload = () => {
+            console.log(`request response text is ${request.responseText}`)
+            const data = JSON.parse(request.responseText)
+            console.log(`response data is ${data}`)
+            if (functionToHandleTheResponse === "showAudioModal") {
+                
+                showAudioModal(data.mediaLocation, data.txt)
+            }
+            else if (functionToHandleTheResponse === 'createNewAccordian') {
+                createNewAccordianCard(queryTopResultText, data.articleContents)
+            }
+            else if (functionToHandleTheResponse === 'both') {
+                showAudioModal(data.mediaLocation, data.txt)
+                createNewAccordianCard(queryTopResultText, data.articleContents)
+            }
+        }
+        const data = new FormData();
+        data.append('wikipediaLink', queryTopResultLink)
+        console.log(`data is ${data}`)
+        // request.setRequestHeader("Content-type", "application/json")
+        request.send(data)
+
+    }
 
     function defaultStyle() {
-        console.log(searchBox.value)
+        console.log(`searchBox.value is ${searchBox.value}`)
         if (!searchBox.value) {
             searchMainDiv.style.borderRadius = "24px"
             searchMainDiv.style.boxShadow = 'none'
@@ -55,7 +123,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         return res;
-
     }
 
     function getWikipediaresponse(searchText) {
@@ -72,7 +139,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // console.log(l)
 
             for (var i = 0; i < 10; i++) {
-
                 textLink = data[3][i]
                 text = data[1][i]
                 if (text) {
@@ -94,6 +160,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // console.log(l.join(''))
             searchSuggestionList.innerHTML = l.join('')
             // document.querySelector('.suggestions').innerHTML = l.join('')
+            queryTopResultLink = data[3][0]
+            // console.log(queryTopResultLink)
+            queryTopResultText = data[1][0]
             return l.join('');
 
 
@@ -112,12 +181,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     searchBox.addEventListener('keyup', e => {
-        focusedStyle()
-        searchQuery = (e.target.value).trim()
-        if (searchQuery) { 
-            getWikipediaresponse(searchQuery) 
+       
+        if (e.key === 'Enter') {
+            console.log("keyup event with enter key")
+            defaultStyle()
+            getAudioFileData("both",)
+        }
+        else {
+            focusedStyle()
+            searchQuery = (e.target.value).trim()
+            if (searchQuery) {
+                getWikipediaresponse(searchQuery)
+            }
         }
     });
+
+    
 
     document.addEventListener('click', e => {
         clickVal = mainDiv.contains(e.target)
@@ -129,4 +208,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-
