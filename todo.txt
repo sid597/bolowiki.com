@@ -1,0 +1,41 @@
+This is a todo list for project requirements.
+
+CHANGE ALL KEYS,PASSWORDS used at development time.
+
+TODO :
+
+- Add language support for search 
+- Show how many characters are there in the article
+- payment include for converting more
+- show remaining 
+- support for converting article more than 5k characters
+- esc key escape search box
+- Add spinner for showing loading
+- Format js to make call for search query in case the suggests are not loaded yet
+- on closing modal make the audio stop 
+- main page
+    - changes in Backend to support this
+    - changes in Frontend
+    - only can get voice search results for introduction
+- Dummy user
+    - With limited permissions like read only
+    - Not able to reset password
+- password reset
+-signup email
+- users previously searched wikilinks list show
+- Website optimisation
+- Linters 
+- arrow keys 
+- directions
+- how to make your own 
+
+
+DOING : 
+- voice search
+    - set up webspeech api 
+    - action performed when clicked on voice icon
+    - show voice search on chrome only
+
+
+
+DONE: 
