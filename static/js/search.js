@@ -11,42 +11,71 @@ document.addEventListener('DOMContentLoaded', () => {
     audioModalHeader = document.querySelector('#audioModalHeader')
     wikipediaAccordian = document.querySelector('#wikipediaAccordian')
 
-    function showAudioModal(mediaLocation, articleText) {
-        console.log(`media location is : ${mediaLocation} and articleText is ${articleText}`)
+
+
+    function createWikipediaContentLinks(wikiContentText) {
+        wikiContentTextJoined = wikiContentText.split(' ').join('_')
+        fullWikiLink = queryTopResultLink + '#' + wikiContentTextJoined
+        // console.log(fullWikiLink)
+
+        return fullWikiLink
+    }
+
+
+    function makeArticlesList(articleText) {
+        l = ['Article Contents :', '<ul>']
+        l.push(`<li class="accordianCardLinks" 
+        id='${createWikipediaContentLinks('')}'
+        >Introduction
+        </li>`)
+        for (i = 1; i < articleText.length; i++) {
+            l.push(`<li class="accordianCardLinks" 
+            id='${createWikipediaContentLinks(articleText[i])}'
+            >${articleText[i]}
+            </li>`)
+        }
+        l.push('</ul>')
+        return l.join('');
+    }
+
+
+
+
+    function showAudioModal(mediaLocation, articleText, articleWikiLink) {
+        // console.log(`media location is : ${mediaLocation} and articleText is ${articleText}`)
         audioModalBody = audioModalContentChildren[1]
         audioModalFooter = audioModalContentChildren[2]
-        console.log(audioModalHeader, audioModalBody, audioModalFooter)
+        // console.log(audioModalHeader, audioModalBody, audioModalFooter)
         audioModalHeader.innerHTML = `<audio controls style="width: 100%;"><source src="${mediaLocation}" type="audio/mpeg" />Your browser does not support the audio element.</audio>`
         audioModalBody.innerHTML = articleText
-        audioModalFooter.innerHTML = `<a href="${queryTopResultLink}">${queryTopResultLink}</a>`
+        audioModalFooter.innerHTML = `<a href="${articleWikiLink}">${articleWikiLink}</a>`
         var myModal = new bootstrap.Modal(document.getElementById('audioModal'))
         myModal.toggle()
-
-
     }
-    function createNewAccordianCard(articleTitle, articleContents){
+
+    function createNewAccordianCard(articleTitle, articleContents) {
+        articleContents = makeArticlesList(articleContents)
+        articleTitleForIds = articleTitle.split(' ').join('')
         let newCard = `<div class="card">
-        <div class="card-header" id="${articleTitle}Wiki">
+        <div class="card-header" id="${articleTitleForIds}Wiki">
           <h2 class="mb-0">
-            <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#${articleTitle}collapse" aria-expanded="true" aria-controls="collapseOne">
+            <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#${articleTitleForIds}collapse" aria-expanded="true" aria-controls="collapseOne">
             ${articleTitle}
             </button>
           </h2>
         </div>
     
-        <div id="${articleTitle}collapse" class="collapse show" aria-labelledby="${articleTitle}Wiki" data-parent="#wikipediaAccordian">
+        <div id="${articleTitleForIds}collapse" class="collapse show" aria-labelledby="${articleTitleForIds}Wiki" data-parent="#wikipediaAccordian">
           <div class="card-body">
             ${articleContents}
           </div>
         </div>
       </div>`
-      wikipediaAccordian.insertAdjacentHTML('afterbegin', newCard)
-      console.log(newCard)
-      
+        wikipediaAccordian.insertAdjacentHTML('afterbegin', newCard)
+        //   console.log(newCard)      
     }
 
-
-    function getAudioFileData(functionToHandleTheResponse) {
+    function getAudioFileData(functionToHandleTheResponse, articleWikiLink) {
         console.log('inside getAudioFileData')
         console.log(`function to handle response is ${functionToHandleTheResponse}`)
         request = new XMLHttpRequest();
@@ -56,19 +85,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = JSON.parse(request.responseText)
             console.log(`response data is ${data}`)
             if (functionToHandleTheResponse === "showAudioModal") {
-                
-                showAudioModal(data.mediaLocation, data.txt)
+
+                showAudioModal(data.mediaLocation, data.txt, articleWikiLink)
             }
             else if (functionToHandleTheResponse === 'createNewAccordian') {
-                createNewAccordianCard(queryTopResultText, data.articleContents)
+                createNewAccordianCard(queryTopResultText, data.articleContents, )
             }
             else if (functionToHandleTheResponse === 'both') {
-                showAudioModal(data.mediaLocation, data.txt)
+                showAudioModal(data.mediaLocation, data.txt, articleWikiLink)
                 createNewAccordianCard(queryTopResultText, data.articleContents)
             }
+
         }
         const data = new FormData();
-        data.append('wikipediaLink', queryTopResultLink)
+        data.append('wikipediaLink', articleWikiLink)
         console.log(`data is ${data}`)
         // request.setRequestHeader("Content-type", "application/json")
         request.send(data)
@@ -76,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function defaultStyle() {
-        console.log(`searchBox.value is ${searchBox.value}`)
+        // console.log(`searchBox.value is ${searchBox.value}`)
         if (!searchBox.value) {
             searchMainDiv.style.borderRadius = "24px"
             searchMainDiv.style.boxShadow = 'none'
@@ -181,11 +211,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     searchBox.addEventListener('keyup', e => {
-       
+
         if (e.key === 'Enter') {
             console.log("keyup event with enter key")
             defaultStyle()
-            getAudioFileData("both",)
+            getAudioFileData("both", queryTopResultLink)
         }
         else {
             focusedStyle()
@@ -196,11 +226,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    
-
     document.addEventListener('click', e => {
-        clickVal = mainDiv.contains(e.target)
-        if (clickVal) {
+        var target = e.target
+        clickVal = mainDiv.contains(target)
+        if (target.className==="accordianCardLinks") {
+            wikipediaArticleLink = target.id
+            console.log(wikipediaArticleLink)
+            getAudioFileData("showAudioModal", wikipediaArticleLink)
+        }
+        else if (clickVal) {
             focusedStyle()
         }
         else {
