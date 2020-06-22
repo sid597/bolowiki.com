@@ -40,10 +40,10 @@ def homepage():
         app.logger.info("Inside homepage")
         if 'logged_in' in session:
             app.logger.info("User is logged in")
-            return redirect(url_for('dashboard'))
+            # return redirect(url_for('dashboard'))
         else:
             app.logger.info("User is NOT logged in")
-            return render_template('layout/main.html')
+        return render_template('layout/main.html')
     except Exception as e:
         return str(e)
 
@@ -69,22 +69,24 @@ def login():
     try:
         app.logger.info("Inside login")
         if 'logged_in' in session:
-            return redirect(url_for('dashboard'))
+            return redirect(url_for('homepage'))
         elif request.method == "POST":
-            app.logger.info("Inside login route %s" % db)
+            app.logger.info("Inside login route ")
+            app.logger.info("request  is %s" %request)
+
             app.logger.info("login request form is %s" % request.form)
             data = User.query.filter_by(username="%s" % thwart(request.form['username'])).first()
 
             passwd = data.password
             app.logger.info(sha256_crypt.verify(request.form['password'], passwd))
-            app.logger.info("FLASK_SECRET_KEY ------> %s" % os.getenv("FLASK_SECRET_KEY"))
+            
 
             if sha256_crypt.verify(request.form['password'], passwd):
                 session['logged_in'] = True
                 session['username'] = request.form['username']
                 app.logger.info("You are now logged in")
                 flash("You are now logged in")
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('homepage'))
             else:
                 app.logger.info("Invalid credentials ")
                 error = "Invalid credentials, try again."
@@ -147,7 +149,7 @@ def register_page():
 
 # app.logger.info("")
 @app.route('/converttospeech/', methods=['GET', 'POST'])
-@login_required
+# @login_required
 def getWiki():
     """ Receive a request to convert the clicked link to audio
         check if link is present in AllWikiLinks
@@ -168,7 +170,8 @@ def getWiki():
     """
     try:
         app.logger.info("Inside getWiki")
-        app.logger.info("request received is %s" % request.form)
+        app.logger.info("request received is %s" % request)
+        app.logger.info("request form received is %s" % request.form)
 
         wikiLinkToBeParsed = str(request.form['wikipediaLink']).strip()
         app.logger.info(
@@ -183,10 +186,9 @@ def getWiki():
             path = parsedUrl.path
             fragment = parsedUrl.fragment
             username = session['username']
-
             newTTS = methodsForTTS(username, path, fragment)
-            mediaLocation = newTTS.orchestrator() + '.mp3'
-            return jsonify({'mediaLocation': mediaLocation, 'txt': 'Congrats !',"success": True,})
+            mediaLocation, articleText, articleContentsList = newTTS.orchestrator() 
+            return jsonify({'mediaLocation': mediaLocation + '.mp3', 'txt': articleText,"success": True, 'articleContents':articleContentsList})
     except Exception as e:
         app.logger.info("error in get wiki : %s" % e)
         return str(e)
