@@ -12,22 +12,21 @@ Note : This module does parse contents of table, images. Also note that wikipedi
 
 
 """
-import bs4 as bs
 import urllib.request
-from pprint import pprint
 from urllib.parse import unquote
 from urllib.parse import urlparse
-from flask import current_app as app
+
+import bs4 as bs
 
 
 class WikipediaParser():
 
     def __init__(self, linkToWiki):
-        
+
         self.wikiLink = urllib.request.urlopen(linkToWiki).read()
         self.soup = bs.BeautifulSoup(self.wikiLink, 'lxml')
         # Get the strings inside title tag, the tiltle always includes "- wikipedia" so remove that and join
-        self.title = ' '.join(str(self.soup.find("title").string).split()[:-2])  
+        self.title = ' '.join(str(self.soup.find("title").string).split()[:-2])
         self.body = self.soup.find('div', class_="mw-parser-output").children
         self.wikiSections = None
         self.wikiSectionTitles = []
@@ -74,7 +73,7 @@ class WikipediaParser():
             list: A list containing all the article content titles 
         """
         try:
-            
+
             self.wikiSections = self.soup.find(id="toc").find_all('li')
             for section in self.wikiSections:
                 self.wikiSectionTitles.append(section.find_all('span')[1].string)
@@ -95,7 +94,6 @@ class WikipediaParser():
             list: A list of all the content which make up the wikipedia article.
         """
 
-        
         for i in self.body:
             tag = i.name
             # print(tag)
@@ -115,7 +113,7 @@ class WikipediaParser():
         Returns:
             list: A list containing the introduction paragraphs
         """
-        
+
         self.getAllContentTags()
         ctr = 0
         for i in self.wikiParas[self.ctr:]:
@@ -133,7 +131,7 @@ class WikipediaParser():
            links, italics, list etc. 
 
         """
-        
+
         l = []
         for i in self.wikiParas[self.ctr:]:
             tag = i.name
@@ -160,7 +158,7 @@ class WikipediaParser():
             - style  -----> don't
             Approach : Go to each tag in p and get string for that tag
         """
-        
+
         l = []
         validInsidePara = ['li', 'dd', 'i', 'a', 'b']
         paraContent = p.contents
@@ -198,7 +196,7 @@ class WikipediaParser():
             dict: A dictionary which has title as key and their content as value for the corresponding
                   wikipedia article.
         """
-        
+
         ptr = self.ctr
         currentTitle = []
 
@@ -232,14 +230,15 @@ class WikipediaParser():
         return self.wikiDict
 
     def instantiate(self):
-        
+
         self.getContentTitles()
         self.getAllContentTags()
         self.getIntroParas()
         self.getTitlesContent()
 
+
 def testThisUrl(url):
-    article =  WikipediaParser(url)
+    article = WikipediaParser(url)
     article.instantiate()
     purl = urlparse(url)
     wikipediaArticlePath = purl.path
@@ -254,6 +253,7 @@ def testThisUrl(url):
     print(article.wikiDict[wikipediaArticleFragment])
     print('_________________________________________________________________________________________________________-')
     return article.wikiDict[wikipediaArticleFragment]
+
 
 def testing():
     url1 = "https://en.wikipedia.org/wiki/Anarchy#French_Revolution_(1789%E2%80%931799)"
@@ -271,9 +271,6 @@ def testing():
     testThisUrl(url6)
     testThisUrl(url7)
 
-   
-   
-    
 
 if __name__ == '__main__':
     testing()

@@ -1,10 +1,12 @@
-from models import *
-from flask import current_app as app
-from logic.wikipedia import WikipediaParser
 import json
-from logic.tts import GoogleTextToSpeech
 from pprint import pformat
 from urllib.parse import unquote
+
+from flask import current_app as app
+
+from logic.tts import GoogleTextToSpeech
+from logic.wikipedia import WikipediaParser
+from models import *
 
 
 def getUserDataFirst(currentUserUsername):
@@ -89,12 +91,12 @@ class methodsForTTS():
             return isArticleThere.location, convertThisArticle, articleContentsList
         else:
             self.addToUsersWikiLinks()
-            
+
             if isArticleThere is None:
                 app.logger.info("Article is none ")
-                
+
                 app.logger.info("Article to convert is : %s " % convertThisArticle)
-                return self.textToSpeech(convertThisArticle),convertThisArticle,articleContentsList
+                return self.textToSpeech(convertThisArticle), convertThisArticle, articleContentsList
             else:
                 app.logger.info("Article is there and its location is : %s" % isArticleThere.location)
                 return isArticleThere.location, convertThisArticle, articleContentsList
@@ -129,9 +131,9 @@ class methodsForTTS():
                 articleFragment = articleDict[self.wikipediaArticleFragment]
                 app.logger.info("Got article fragment ")
                 articleContents = [i for i in articleDict]
-                app.logger.info("article contents list is %s" %articleContents)
-                
-                return ''.join(articleFragment),articleContents
+                app.logger.info("article contents list is %s" % articleContents)
+
+                return ''.join(articleFragment), articleContents
             wikiUrl = 'https://en.wikipedia.org' + self.wikipediaArticlePath
             app.logger.info("wikipedia url is : %s" % wikiUrl)
             parsedArticle = WikipediaParser(wikiUrl)
@@ -145,8 +147,8 @@ class methodsForTTS():
                             (getWikipediaArticleDataFirst(self.nameWithoutFragment)).articleDict)
             articleFragment = articleDict[self.wikipediaArticleFragment]
             articleContents = [i for i in articleDict]
-            app.logger.info("article contents list is %s" %articleContents)
-            return ''.join(articleFragment),articleContents
+            app.logger.info("article contents list is %s" % articleContents)
+            return ''.join(articleFragment), articleContents
         except Exception as e:
             app.logger.info("error in get wiki : %s" % e)
             return str(e)

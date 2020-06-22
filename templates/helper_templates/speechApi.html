@@ -23,57 +23,62 @@
       </button>
       <div id="res"></div>
     </div>
-  </body>
+   </body>
 
   <!-- ==================================================================================
 ================================================================================== -->
 
-  <script>
+   //<script>
+    function listenToVoiceQuery(outputTag) {
+      const result = document.querySelector('#res');
+      const listening = false;
 
-      const result = document.querySelector("#res");
-      let listning=false;
-
-      if (!("webkitSpeechRecognition" in window)) {
-        upgrade();
+      if (!('webkitSpeechRecognition' in window)) {
+        // TODO : Show a update to chrome message or completly hide this svg
       } else {
-        var recognition = new webkitSpeechRecognition();
+        const recognition = new webkitSpeechRecognition();
         // recognition.continuous = true;
         recognition.interimResults = true;
-        recognition.lang = "en-US";
-        console.log(recognition);
+        recognition.lang = 'en-IN';
+        // console.debug(recognition);
 
-        recognition.onstart = e => {
-          console.log(`recognition started ${e}`);
+        recognition.onstart = (e) => {
+          console.debug(`recognition started ${e}`);
         };
 
-        recognition.onresult = e => {
-          // console.log(`recognition complete here is your result ${e.results[0][0].transcript}`);
-          // console.log(`here is your event ${e}`);
-          trans = e.results[0][0].transcript;
-          
-          console.log(`recognition complete here is your result ${trans}`);
+        recognition.onresult = (e) => {
+          // console.debug(`recognition complete here is your result ${e.results[0][0].transcript}`);
+          // console.debug(`here is your event ${e}`);
+          const trans = e.results[0][0].transcript;
+    
+          console.debug(`recognition complete here is your result ${trans}`);
+          result.innerHTML = trans;
           return trans;
         };
 
         recognition.onerror = (e) => {
-          console.log(` error occured : ${e.error}`);
+          console.debug(` error occured : ${e.error}`);
         };
         recognition.onend = (e) => {
-          console.log("ended");
+          console.debug('ended');
         };
       }
 
-      function upgrade(){
-        console.log("upgrade")
+      function upgrade() {
+        console.debug('upgrade');
       }
 
       function log() {
-        console.log("clicked");
+        console.debug('clicked');
         recognition.start();
       }
-    
-  </script>
+      const a = document.querySelector('#res');
+      a.addEventListener('click', () => {
+        log();
+      });
+    }
+    </script>
 
   <!-- ==================================================================================
 ================================================================================== -->
-</html>
+<!-- </html> -->

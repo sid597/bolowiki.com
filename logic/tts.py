@@ -1,6 +1,7 @@
-from google.cloud import texttospeech
-from flask import current_app as app
 import os
+
+from flask import current_app as app
+from google.cloud import texttospeech
 
 
 def GoogleTextToSpeech(textToConvert, nameToSaveWith):

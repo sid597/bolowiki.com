@@ -1,11 +1,10 @@
 from google.cloud import texttospeech
-import os
 from wikipediaTesting import *
 
+
 def GoogleTextToSpeech(textToConvert, nameToSaveWith):
-    
     # print(textToConvert)
-    
+
     # Instantiates a client
     client = texttospeech.TextToSpeechClient()
 
@@ -21,7 +20,7 @@ def GoogleTextToSpeech(textToConvert, nameToSaveWith):
     # Select the type of audio file you want returned
     audio_config = texttospeech.AudioConfig(
         audio_encoding=texttospeech.AudioEncoding.MP3,
-        speaking_rate = 0.85
+        speaking_rate=0.85
     )
 
     # Perform the text-to-speech request on the text input with the selected
@@ -32,7 +31,7 @@ def GoogleTextToSpeech(textToConvert, nameToSaveWith):
 
     saveDirectory = "/home/sid597/Don-tReadListen/" + "/static/tts/"
     mediaLocation = saveDirectory + nameToSaveWith + ".mp3"
-    
+
     # The response's audio_content is binary.
     with open(mediaLocation, "wb") as out:
         # Write the response to the output file.

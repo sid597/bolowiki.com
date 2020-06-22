@@ -1,17 +1,19 @@
-from flask import Flask, render_template, url_for, redirect, flash, request, session, jsonify
-from wtforms import Form, validators, PasswordField, TextField
-from passlib.hash import sha256_crypt
-from pymysql import escape_string as thwart
-from functools import wraps
-from urllib.parse import urlparse
-import os
 import gc
 import logging
+import os
+from functools import wraps
+from urllib.parse import urlparse
+
+from flask import Flask, render_template, url_for, redirect, flash, request, session, jsonify
+from passlib.hash import sha256_crypt
+from pymysql import escape_string as thwart
+from wtforms import Form, validators, PasswordField, TextField
+
 from logic.dbOperations import *
 
-app = Flask(__name__, template_folder='templates' )
+app = Flask(__name__, template_folder='templates')
 logging.basicConfig(filename='error.log', level=logging.DEBUG)
-app.config['EXPLAIN_TEMPLATE_LOADING']= True
+app.config['EXPLAIN_TEMPLATE_LOADING'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
@@ -56,7 +58,6 @@ def dashboard():
     return render_template("/layout/dashboard.html")
 
 
-
 @app.errorhandler(404)
 def page_not_found(e):
     app.logger.info("Inside page_not_found")
@@ -72,14 +73,13 @@ def login():
             return redirect(url_for('homepage'))
         elif request.method == "POST":
             app.logger.info("Inside login route ")
-            app.logger.info("request  is %s" %request)
+            app.logger.info("request  is %s" % request)
 
             app.logger.info("login request form is %s" % request.form)
             data = User.query.filter_by(username="%s" % thwart(request.form['username'])).first()
 
             passwd = data.password
             app.logger.info(sha256_crypt.verify(request.form['password'], passwd))
-            
 
             if sha256_crypt.verify(request.form['password'], passwd):
                 session['logged_in'] = True
@@ -109,6 +109,7 @@ class RegistrationForm(Form):
         validators.EqualTo('confirm', message='Passwords must match')
     ])
     confirm = PasswordField('Repeat Password')
+
 
 @app.route('/register/', methods=["GET", "POST"])
 def register_page():
@@ -181,14 +182,15 @@ def getWiki():
         if parsedUrl.netloc != 'en.wikipedia.org' or parsedUrl.scheme != 'https':
 
             msg = "Pass a valid wikipedia url, for e.g :  https://en.wikipedia.org/wiki/Anarchy"
-            return jsonify({'txt': msg, 'mediaLocation': '',"success": False,})
+            return jsonify({'txt': msg, 'mediaLocation': '', "success": False, })
         else:
             path = parsedUrl.path
             fragment = parsedUrl.fragment
             username = session['username']
             newTTS = methodsForTTS(username, path, fragment)
-            mediaLocation, articleText, articleContentsList = newTTS.orchestrator() 
-            return jsonify({'mediaLocation': mediaLocation + '.mp3', 'txt': articleText,"success": True, 'articleContents':articleContentsList})
+            mediaLocation, articleText, articleContentsList = newTTS.orchestrator()
+            return jsonify({'mediaLocation': mediaLocation + '.mp3', 'txt': articleText, "success": True,
+                            'articleContents': articleContentsList})
     except Exception as e:
         app.logger.info("error in get wiki : %s" % e)
         return str(e)
@@ -202,7 +204,6 @@ def logout():
     flash("You have been logged out!")
     gc.collect()
     return redirect(url_for('homepage'))
-
 
 
 ###########################################
@@ -220,10 +221,12 @@ def createTables():
 def drop():
     db.drop_all()
 
+
 def dc():
     drop()
     createTables()
     app.run(host="0.0.0.0", debug=True)
+
 
 if __name__ == '__main__':
     with app.app_context():

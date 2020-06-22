@@ -12,22 +12,20 @@ Note : This module does parse contents of table, images. Also note that wikipedi
 
 
 """
-import bs4 as bs
 import urllib.request
-from pprint import pprint
-from urllib.parse import unquote
-from urllib.parse import urlparse
+
+import bs4 as bs
 from flask import current_app as app
 
 
 class WikipediaParser():
 
     def __init__(self, linkToWiki):
-        
+
         self.wikiLink = urllib.request.urlopen(linkToWiki).read()
         self.soup = bs.BeautifulSoup(self.wikiLink, 'lxml')
         # Get the strings inside title tag, the tiltle always includes "- wikipedia" so remove that and join
-        self.title = ' '.join(str(self.soup.find("title").string).split()[:-2])  
+        self.title = ' '.join(str(self.soup.find("title").string).split()[:-2])
         self.body = self.soup.find('div', class_="mw-parser-output").children
         self.wikiSections = None
         self.wikiSectionTitles = []
