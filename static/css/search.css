@@ -31,13 +31,13 @@
 }
 #searchSVGIcon {
   margin-top: 3px;
-  color: rgb(154, 160, 166);
+  color: #4285f4;
   display: inline-block;
   fill: currentcolor;
   height: 24px;
   line-height: 24px;
   position: relative;
-  width: 24px;
+  width: 32px;
 }
 #searchBox {
   display: flex;
