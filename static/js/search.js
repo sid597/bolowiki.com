@@ -7,27 +7,35 @@ document.addEventListener('DOMContentLoaded', async () => {
   const searchIcon = document.querySelector('#searchSVG');
   const searchMainDiv = document.querySelector('#searchMainDiv');
   const searchBox = document.querySelector('#searchInputBox');
-  const searchLanguage = document.querySelector('#searchLanguage');
   const searchSuggestion = document.querySelector('#searchSuggestion');
   const searchSuggestionList = document.querySelector('#searchSuggestionList');
   const mainDiv = document.querySelector('#mainDiv');
   const audioModalContentChildren = document.querySelector('#audioModalContent').children;
   const audioModal = new bootstrap.Modal(document.querySelector('#audioModal'));
+  const audioModalById = document.querySelector('#audioModal');
   const audioModalHeader = document.querySelector('#audioModalHeader');
   const wikipediaAccordian = document.querySelector('#wikipediaAccordian');
   const voiceSearchModal = new bootstrap.Modal(document.querySelector('#voiceSearchModal'));
   const voiceSearchIcon = document.querySelector('#voiceSearch');
-  // const voiceSearchError = document.querySelector('#voiceSearchError');
   const voiceSearchCurrentStatus = document.querySelector('#voiceSearchCurrentStatus');
   const voiceSearchResult = document.querySelector('#voiceSearchCurrentStatus');
   const spinner = document.querySelector('#spinner');
-
+  const languageSelector = document.querySelector('#languageSelector');
+  let queryLanguage = languageSelector.options[languageSelector.selectedIndex].value;
+  const wikiLinksDict = {
+    hi: 'https://hi.wikipedia.org/w/api.php?action=opensearch&format=json&origin=*&formatversion=2&search=',
+    en: 'https://en.wikipedia.org/w/api.php?action=opensearch&format=json&origin=*&formatversion=2&search=',
+  };
+  const voiceSearchLanguagesDict = {
+    en: 'en-US',
+    hi: 'hi-IN',
+  };
 
   if (!isChrome) {
     voiceSearchIcon.style.display = 'none';
   }
 
- // #############################################################################
+  // #############################################################################
   // ## General
   // #############################################################################
 
@@ -64,6 +72,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     listenToVoiceQuery();
   });
 
+  function getVoiceSearchLanguage() {
+    return voiceSearchLanguagesDict[queryLanguage];
+  }
+
   async function listenToVoiceQuery() {
     const listening = false;
     console.debug('inside listen to voice query');
@@ -73,7 +85,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const recognition = await new webkitSpeechRecognition();
       // recognition.continuous = true;
       recognition.interimResults = true;
-      recognition.lang = searchLanguage;
+      recognition.lang = getVoiceSearchLanguage();
       console.debug(recognition);
 
       recognition.onstart = (e) => {
@@ -126,11 +138,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     const audioModalBody = audioModalContentChildren[1];
     const audioModalFooter = audioModalContentChildren[2];
     // console.debug(audioModalHeader, audioModalBody, audioModalFooter)
-    audioModalHeader.innerHTML = `<audio controls style="width: 100%;"><source src="${mediaLocation}" type="audio/mpeg" />Your browser does not support the audio element.</audio>`;
+    audioModalHeader.innerHTML = `<audio id="audioControl" controls style="width: 100%;"><source src="${mediaLocation}" type="audio/mpeg" />Your browser does not support the audio element.</audio>`;
     audioModalBody.innerHTML = articleText;
     audioModalFooter.innerHTML = `<a href="${articleWikiLink}">${articleWikiLink}</a>`;
     audioModal.toggle();
   }
+
+  audioModalById.addEventListener('hide.bs.modal', () => {
+    console.log('modal closed');
+    const audioControl = document.querySelector('#audioControl');
+    audioControl.pause();
+  });
 
   // #############################################################################
   // ## Show wikipedia article accordian
@@ -185,13 +203,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ## Make requests
   // #############################################################################
   function getAudioFileData(functionToHandleTheResponse, articleWikiLink) {
-    showSpinner()
+    showSpinner();
     console.debug('inside getAudioFileData');
     console.debug(`function to handle response is ${functionToHandleTheResponse}`);
     const request = new XMLHttpRequest();
     request.open('POST', '/converttospeech/');
     request.onload = () => {
-      hideSpinner()
+      hideSpinner();
       console.debug(`request response text is ${request.responseText}`);
       const data = JSON.parse(request.responseText);
       console.debug(`response data is ${data}`);
@@ -227,37 +245,48 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     return res;
   }
-  function getWikipediaresponse(searchText) {
-    const wikiLink = `https://en.wikipedia.org/w/api.php?action=opensearch&format=json&origin=*&formatversion=2&search=${searchText}&namespace=0&limit=10`;
 
+  function getWikipediaSearchLink(searchQueryText) {
+    console.log(queryLanguage);
+    const link = `${wikiLinksDict[queryLanguage] + searchQueryText}&namespace=0&limit=10`;
+    console.log(link);
+    return link;
+  }
+
+  function getWikipediaresponseAsList(searchQueryText) {
+    const wikiLink = getWikipediaSearchLink(searchQueryText);
     const request = new XMLHttpRequest();
     request.open('GET', wikiLink);
 
     request.onload = () => {
       const data = JSON.parse(request.responseText);
       // console.debug(` data from wikipedia response is ${data}`);
-      const l = ['<ul class="list-group list-group-flush">'];
+      // const l = ['<ul class="list-group list-group-flush">'];
+      const l = ['<ul class="dropdown-menu">'];
+
       // console.debug(l)
 
       for (let i = 0; i < 10; i += 1) {
         const textLink = data[3][i];
         const text = data[1][i];
         if (text) {
-          const matchText = matchString(searchText, text);
+          const matchText = matchString(searchQueryText, text);
           const unmatchedText = text.slice(matchText.length, text.length);
-          // console.debug(`${searchText}-->`, matchText, '||', unmatchedText)
+          // console.debug(`${searchQueryText}-->`, matchText, '||', unmatchedText)
           if (matchText) {
             if (unmatchedText) {
-              l.push(`<a class="resultLink" href=${textLink}> <li class="listitem"><span style="font-weight:600">${matchText}</span><span>${unmatchedText}</span></li></a>`);
+              // l.push(`<a class="resultLink" href=${textLink}> <li class="listitem"><span style="font-weight:600">${matchText}</span><span>${unmatchedText}</span></li></a>`);
+              l.push(` <li ><a class=dropdown-item" href=${textLink}><span style="font-weight:600">${matchText}</span><span>${unmatchedText}</span></a></li>`);
             } else {
-              l.push(`<a class="resultLink" href=${textLink}> <li class="listitem"><b>${matchText}</b></li></a>`);
+              // l.push(`<a class="resultLink" href=${textLink}> <li class="listitem"><b>${matchText}</b></li></a>`);
+              l.push(`<li><a class=dropdown-item" href=${textLink}> <b>${matchText}</b></a></li>`);
             }
           }
           // document.querySelector('.suggestions').append(ii)
         }
       }
       l.push('</ul>');
-      // console.debug(l.join(''))
+      console.debug(l.join(''))
       createSuggestionList(l);
       // document.querySelector('.suggestions').innerHTML = l.join('')
       queryTopResultLink = data[3][0];
@@ -303,6 +332,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function createSuggestionList(listToShow) {
+    console.log(listToShow.join(''))
     searchSuggestionList.innerHTML = listToShow.join('');
   }
 
@@ -334,7 +364,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (query) {
       const searchQuery = query.trim();
       if (searchQuery) {
-        getWikipediaresponse(searchQuery);
+        getWikipediaresponseAsList(searchQuery);
       }
     }
   }
@@ -347,7 +377,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     mouseoverMainDiv();
   });
   mainDiv.addEventListener('mouseout', () => {
-    console.debug(searchBox.value);
     if (searchBox.value === '') {
       mouseoutMainDiv();
     } else {
@@ -356,11 +385,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   searchBox.addEventListener('keyup', (e) => {
+    const query = e.target.value;
     if (e.key === 'Enter') {
-      console.debug('keyup event with enter key');
-      searchQueryInsideInputBox('both', queryTopResultLink);
+      if (queryTopResultLink) {
+        console.debug('keyup event with enter key');
+        searchQueryInsideInputBox('both', queryTopResultLink);
+      } else {
+        getWikipediaresponseAsList(query);
+        searchQueryInsideInputBox('both', queryTopResultLink);
+      }
     } else {
-      const query = e.target.value;
       showSuggestionsForQueryInInputBox(query);
     }
   });
@@ -369,6 +403,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (typeof e.data === 'undefined') {
       showSuggestionsForQueryInInputBox(e.data);
     }
+  });
+
+  languageSelector.addEventListener('click', () => {
+    const query = searchBox.value;
+    queryLanguage = languageSelector.options[languageSelector.selectedIndex].value;
+    console.log(`Selected language is ${queryLanguage}`);
+    showSuggestionsForQueryInInputBox(query);
   });
 
   document.addEventListener('click', (e) => {

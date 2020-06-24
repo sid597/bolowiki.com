@@ -2,7 +2,7 @@
 <div class="mt" id="mainDiv">
   <div id="searchMainDiv">
     <div id="searchDiv">
-      <span id="searchSVGIcon"> </span>
+      <span id="searchSVGIcon" style="width: 10px;"> </span>
       <div id="searchBox">
         <div id="searchBar"></div>
         <input
@@ -15,7 +15,7 @@
           autocapitalize="off"
           autocomplete="off"
           autocorrect="off"
-          autofocus=""
+          autofocus="on"
           role="combobox"
           spellcheck="false"
           title="Search"
@@ -23,6 +23,12 @@
           aria-label="Search"
         />
       </div>
+      
+        <select id="languageSelector" name="language">
+          <option value="en" lang="EN"> Engilsh</option>
+          <option value="hi" lang="hi"> Hindi</option>
+        </select>
+      
       <span style="font-size: 25px; color: #dfe1e5;">|</span>
       <div id="voiceSearch" data-toggle="modal" data-target="#voiceSearchModal">
         <div
