@@ -135,14 +135,25 @@
   text-decoration: none;
 }
 
-@media (max-width:475px){
+@media (max-width:375px){
 #mainDiv,#searchMainDiv{
   width:300px;
   margin:0 auto;
 }
 
 #searchInputBox{
-  width: 200px;
+  width: 156px;
 }
 
 }
+@media (max-width:475px){
+  #mainDiv,#searchMainDiv{
+    width:345px;
+    margin:0 auto;
+  }
+  
+  #searchInputBox{
+    width: 200px;
+  }
+  
+  }

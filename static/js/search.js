@@ -323,7 +323,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   searchIcon.addEventListener('click', () => {
-    searchQueryInsideInputBox('both', searchBox.value);
+    searchQueryInsideInputBox('both', queryTopResultLink);
   });
 
   mainDiv.addEventListener('mouseover', () => {
