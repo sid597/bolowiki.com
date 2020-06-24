@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const searchSuggestionList = document.querySelector('#searchSuggestionList');
   const mainDiv = document.querySelector('#mainDiv');
   const audioModalContentChildren = document.querySelector('#audioModalContent').children;
+  const audioModal = new bootstrap.Modal(document.querySelector('#audioModal'));
   const audioModalHeader = document.querySelector('#audioModalHeader');
   const wikipediaAccordian = document.querySelector('#wikipediaAccordian');
   const voiceSearchModal = new bootstrap.Modal(document.querySelector('#voiceSearchModal'));
@@ -19,10 +20,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   // const voiceSearchError = document.querySelector('#voiceSearchError');
   const voiceSearchCurrentStatus = document.querySelector('#voiceSearchCurrentStatus');
   const voiceSearchResult = document.querySelector('#voiceSearchCurrentStatus');
+  const spinner = document.querySelector('#spinner');
+
 
   if (!isChrome) {
     voiceSearchIcon.style.display = 'none';
   }
+
+ // #############################################################################
+  // ## General
+  // #############################################################################
+
+  function showSpinner() {
+    spinner.style.display = 'flex';
+  }
+
+  function hideSpinner() {
+    spinner.style.display = 'none';
+  }
+
   // #############################################################################
   // ## Voice search related Functions                                          ##
   // #############################################################################
@@ -113,8 +129,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     audioModalHeader.innerHTML = `<audio controls style="width: 100%;"><source src="${mediaLocation}" type="audio/mpeg" />Your browser does not support the audio element.</audio>`;
     audioModalBody.innerHTML = articleText;
     audioModalFooter.innerHTML = `<a href="${articleWikiLink}">${articleWikiLink}</a>`;
-    const myModal = new bootstrap.Modal(document.querySelector('#audioModal'));
-    myModal.toggle();
+    audioModal.toggle();
   }
 
   // #############################################################################
@@ -170,11 +185,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ## Make requests
   // #############################################################################
   function getAudioFileData(functionToHandleTheResponse, articleWikiLink) {
+    showSpinner()
     console.debug('inside getAudioFileData');
     console.debug(`function to handle response is ${functionToHandleTheResponse}`);
     const request = new XMLHttpRequest();
     request.open('POST', '/converttospeech/');
     request.onload = () => {
+      hideSpinner()
       console.debug(`request response text is ${request.responseText}`);
       const data = JSON.parse(request.responseText);
       console.debug(`response data is ${data}`);

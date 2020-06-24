@@ -71,7 +71,7 @@
     class="modal fade voiceSearchBack"
     id="voiceSearchModal"
     tabindex="-1"
-    aria-labelledby="exampleModalLabel"
+    aria-labelledby="voiceSearchModalLabel"
     aria-hidden="true"
   >
     <div class="modal-dialog">
@@ -91,5 +91,40 @@
 <style>
   .voiceSearchBack {
     background-color: white;
+  }
+</style>
+
+<div
+  class="modal fade"
+  id="spinnerModal"
+  tabindex="-1"
+  aria-labelledby="spinnerModalModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog"></div>
+</div>
+<div id="spinner">
+  <div class="d-flex justify-content-center h-100 row align-items-center">
+    <div class="spinner-border" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  html,
+  body {
+    height: 100%;
+    width: 100%;
+  }
+  #spinner {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: #0a0a095c;
+    z-index: 999;
   }
 </style>
