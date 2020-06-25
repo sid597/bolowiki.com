@@ -1,3 +1,4 @@
+/* eslint-disable no-multiple-empty-lines */
 /* eslint-disable no-use-before-define */
 document.addEventListener('DOMContentLoaded', async () => {
   const isChrome = !!window.chrome;
@@ -35,9 +36,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     voiceSearchIcon.style.display = 'none';
   }
 
+
+
   // #############################################################################
   // ## General
   // #############################################################################
+
+
 
   function showSpinner() {
     spinner.style.display = 'flex';
@@ -47,9 +52,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     spinner.style.display = 'none';
   }
 
+
+
   // #############################################################################
   // ## Voice search related Functions                                          ##
   // #############################################################################
+
+
+
 
   function showVoiceSearchError(msg) {
     voiceSearchCurrentStatus.className = 'alert alert-danger';
@@ -130,9 +140,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+
+
   // #############################################################################
   // ## Audio Modal for search query result
   // #############################################################################
+
+
+
+
   function showAudioModal(mediaLocation, articleText, articleWikiLink) {
     // console.debug(`media location is : ${mediaLocation} and articleText is ${articleText}`)
     const audioModalBody = audioModalContentChildren[1];
@@ -150,9 +166,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     audioControl.pause();
   });
 
+
+
   // #############################################################################
   // ## Show wikipedia article accordian
   // #############################################################################
+
+
 
   function createWikipediaContentLinks(wikiContentText) {
     const wikiContentTextJoined = wikiContentText.split(' ').join('_');
@@ -199,9 +219,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     //   console.debug(newCard)
   }
 
+
+
   // #############################################################################
   // ## Make requests
   // #############################################################################
+
+
+
   function getAudioFileData(functionToHandleTheResponse, articleWikiLink) {
     showSpinner();
     console.debug('inside getAudioFileData');
@@ -253,6 +278,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     return link;
   }
 
+  function createSuggestionList(data, searchQueryText) {
+    const l = ['<ul class="list-group list-group-flush">'];
+
+    // console.debug(l)
+
+    for (let i = 0; i < 10; i += 1) {
+      const textLink = data[3][i];
+      const text = data[1][i];
+      if (text) {
+        const matchText = matchString(searchQueryText, text);
+        const unmatchedText = text.slice(matchText.length, text.length);
+        // console.debug(`${searchQueryText}-->`, matchText, '||', unmatchedText)
+        if (matchText) {
+          if (unmatchedText) {
+            l.push(`<a class="resultLink" href=${textLink}> <li class="listitem"><span style="font-weight:600">${matchText}</span><span>${unmatchedText}</span></li></a>`);
+          } else {
+            l.push(`<a class="resultLink" href=${textLink}> <li class="listitem"><b>${matchText}</b></li></a>`);
+          }
+        }
+        // document.querySelector('.suggestions').append(ii)
+      }
+    }
+    l.push('</ul>');
+    searchSuggestionList.innerHTML = l.join('');
+  }
+
   function getWikipediaresponseAsList(searchQueryText) {
     const wikiLink = getWikipediaSearchLink(searchQueryText);
     const request = new XMLHttpRequest();
@@ -260,47 +311,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     request.onload = () => {
       const data = JSON.parse(request.responseText);
-      // console.debug(` data from wikipedia response is ${data}`);
-      // const l = ['<ul class="list-group list-group-flush">'];
-      const l = ['<ul class="dropdown-menu">'];
-
-      // console.debug(l)
-
-      for (let i = 0; i < 10; i += 1) {
-        const textLink = data[3][i];
-        const text = data[1][i];
-        if (text) {
-          const matchText = matchString(searchQueryText, text);
-          const unmatchedText = text.slice(matchText.length, text.length);
-          // console.debug(`${searchQueryText}-->`, matchText, '||', unmatchedText)
-          if (matchText) {
-            if (unmatchedText) {
-              // l.push(`<a class="resultLink" href=${textLink}> <li class="listitem"><span style="font-weight:600">${matchText}</span><span>${unmatchedText}</span></li></a>`);
-              l.push(` <li ><a class=dropdown-item" href=${textLink}><span style="font-weight:600">${matchText}</span><span>${unmatchedText}</span></a></li>`);
-            } else {
-              // l.push(`<a class="resultLink" href=${textLink}> <li class="listitem"><b>${matchText}</b></li></a>`);
-              l.push(`<li><a class=dropdown-item" href=${textLink}> <b>${matchText}</b></a></li>`);
-            }
-          }
-          // document.querySelector('.suggestions').append(ii)
-        }
-      }
-      l.push('</ul>');
-      console.debug(l.join(''))
-      createSuggestionList(l);
-      // document.querySelector('.suggestions').innerHTML = l.join('')
+      createSuggestionList(data, searchQueryText);
       queryTopResultLink = data[3][0];
-      // console.debug(queryTopResultLink)
       queryTopResultText = data[1][0];
-      return l.join('');
     };
     request.send(null);
     // console.debug(request.responseText)
   }
 
+
+
+
   // #############################################################################
   // ## Search query and suggestion List
   // #############################################################################
+
+
+
   function defaultStyle() {
     // console.debug(`searchBox.value is ${searchBox.value}`)
     if (!searchBox.value) {
@@ -331,10 +358,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  function createSuggestionList(listToShow) {
-    console.log(listToShow.join(''))
-    searchSuggestionList.innerHTML = listToShow.join('');
-  }
+
 
   function mouseoverMainDiv() {
     searchMainDiv.style.boxShadow = '0 1px 6px 0 rgba(32,33,36,0.28)';
