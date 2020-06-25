@@ -34,7 +34,8 @@ def getAllWikiLinksDataAll(linksNameTosearchWith=''):
 
 
 def createNewWikipediaArticle(articleNameTosaveWith, articleDictToSave):
-    newWikiArticle = WikipediaArticles(articleName=articleNameTosaveWith, articleDict=articleDictToSave)
+    newWikiArticle = WikipediaArticles(
+        articleName=articleNameTosaveWith, articleDict=articleDictToSave)
     db.session.add(newWikiArticle)
     db.session.commit()
 
@@ -47,7 +48,8 @@ def createNewAllWikiLink(articleNameTosaveWith, articleLocationToSaveWhere, text
 
 
 def createNewUser(username, email, password):
-    app.logger.info("username,email,password are : %s, %s, %s" % (username, email, password))
+    app.logger.info("username,email,password are : %s, %s, %s" %
+                    (username, email, password))
     newUser = User(username=username, password=password, email=email)
     db.session.add(newUser)
     db.session.commit()
@@ -69,51 +71,63 @@ class methodsForTTS():
         self.currentUserUsername = username
         self.wikipediaArticlePath = path
         self.wikipediaArticleFragment = ' '.join(unquote(fragment).split('_'))
-        self.nameToSaveWith = unquote('_'.join(path.split('/')) + '#' + self.wikipediaArticleFragment)
+        self.nameToSaveWith = unquote(
+            '_'.join(path.split('/')) + '#' + self.wikipediaArticleFragment)
         self.nameWithoutFragment = str('_'.join(path.split('/')))
-        self.filename = unquote('_'.join(path.split('/')) + '__' + self.wikipediaArticleFragment)
+        self.filename = unquote(
+            '_'.join(path.split('/')) + '__' + self.wikipediaArticleFragment)
+        self.articleFragment = None
+        self.articleContentsList = None
+        self.articleTotalCharacterCount = 0
+        self.articleFragmentLength = 0
 
     def orchestrator(self):
         app.logger.info("Inside orchestrator")
-        app.logger.info("self.currentUserUsername is %s " % self.currentUserUsername)
-        app.logger.info("self.wikipediaArticlePath is %s " % self.wikipediaArticlePath)
-        app.logger.info("self.wikipediaArticleFragment is %s " % self.wikipediaArticleFragment)
+        app.logger.info("self.currentUserUsername is %s " %
+                        self.currentUserUsername)
+        app.logger.info("self.wikipediaArticlePath is %s " %
+                        self.wikipediaArticlePath)
+        app.logger.info("self.wikipediaArticleFragment is %s " %
+                        self.wikipediaArticleFragment)
         app.logger.info("self.nameToSaveWith is %s " % self.nameToSaveWith)
         app.logger.info("self.filename is %s " % self.filename)
 
         currentUser = getUserDataFirst(self.currentUserUsername)
         userWikiLinks = currentUser.wikiLinks
         isArticleThere = getAllWikiLinksDataFirst(self.nameToSaveWith)
-        convertThisArticle, articleContentsList = self.getWikipediaArticleFragment()
+        self.getWikipediaArticleFragment()
         if self.nameToSaveWith in userWikiLinks:
             # TODO somehow tell the user to move to that location
-            # app.logger.info("Article data %s" %(isArticleThere.location, convertThisArticle, articleContentsList))
-            return isArticleThere.location, convertThisArticle, articleContentsList
-        else:
-            self.addToUsersWikiLinks()
+            # app.logger.info("Article data %s" %(isArticleThere.location, self.articleFragment, articleContentsList))
+            return isArticleThere.location, self.articleFragment, self.articleContentsList, self.articleFragmentLength, self.articleTotalCharacterCount
 
-            if isArticleThere is None:
-                app.logger.info("Article is none ")
+        self.addToUsersWikiLinks()
+        if isArticleThere is None:
+            app.logger.info("Article is none ")
 
-                app.logger.info("Article to convert is : %s " % convertThisArticle)
-                return self.textToSpeech(convertThisArticle), convertThisArticle, articleContentsList
-            else:
-                app.logger.info("Article is there and its location is : %s" % isArticleThere.location)
-                return isArticleThere.location, convertThisArticle, articleContentsList
+            app.logger.info("Article to convert is : %s " %
+                            self.articleFragment)
+            return self.textToSpeech(self.articleFragment), self.articleFragment, self.articleContentsList, self.articleFragmentLength, self.articleTotalCharacterCount
+        app.logger.info("Article is there and its location is : %s" %
+                        isArticleThere.location)
+        return isArticleThere.location, self.articleFragment, self.articleContentsList, self.articleFragmentLength, self.articleTotalCharacterCount
 
     def addToUsersWikiLinks(self):
         try:
             app.logger.info("Inside addToUsersWikiLinks")
             user = getUserDataFirst(self.currentUserUsername)
             userWikiLinks = user.wikiLinks
-            app.logger.info("Is name to save with in user wiki links %s" % self.nameToSaveWith not in userWikiLinks)
+            app.logger.info("Is name to save with in user wiki links %s" %
+                            self.nameToSaveWith not in userWikiLinks)
             if (self.nameToSaveWith not in userWikiLinks) or (userWikiLinks is None):
                 user.wikiLinks += ' ' + self.nameToSaveWith
                 db.session.commit()
-                app.logger.info("username is %s : links are %s" % (self.currentUserUsername, user.wikiLinks))
+                app.logger.info("username is %s : links are %s" %
+                                (self.currentUserUsername, user.wikiLinks))
 
             else:
-                app.logger.info("link is already there in user's wiki link BUT HOW CAN THIS BE ? ")
+                app.logger.info(
+                    "link is already there in user's wiki link BUT HOW CAN THIS BE ? ")
 
         except Exception as e:
             app.logger.info("error in addToUsersWikiLinks : %s" % e)
@@ -123,32 +137,46 @@ class methodsForTTS():
         try:
             app.logger.info("Inside getWikipediaArticleFragment")
             article = getWikipediaArticleDataFirst(self.nameWithoutFragment)
-            app.logger.info(pformat("article is : %s" % article))
+            app.logger.info("article is : %s" % article)
             if article is not None:
                 # app.logger.info(pformat("article is : %s" % article.articleDict))
                 articleDict = json.loads(article.articleDict)
                 # pprint(articleDict)
-                articleFragment = articleDict[self.wikipediaArticleFragment]
+                self.articleFragment = ''.join(
+                    articleDict[self.wikipediaArticleFragment][0])
                 app.logger.info("Got article fragment ")
-                articleContents = [i for i in articleDict]
-                app.logger.info("article contents list is %s" % articleContents)
-
-                return ''.join(articleFragment), articleContents
+                app.logger.info("article fragment is %s" % self.articleFragment)
+                self.articleFragmentLength = len(self.articleFragment)
+                app.logger.debug("articleFragmentLength is %s" %
+                             self.articleFragmentLength)
+                
+                self.articleContentsList = [i for i in articleDict]
+                app.logger.info("article contents list is %s" %
+                                articleContentsList)
             wikiUrl = 'https://en.wikipedia.org' + self.wikipediaArticlePath
             app.logger.info("wikipedia url is : %s" % wikiUrl)
             parsedArticle = WikipediaParser(wikiUrl)
-            parsedArticle.instantiate()
+            articleDict, articleTotalCharacterCount = parsedArticle.instantiate()
+            app.logger.debug("articleTotalCharacterCount is %s" %
+                             articleTotalCharacterCount)
+            self.articleTotalCharacterCount = articleTotalCharacterCount
             app.logger.info("wikipedia parsedArticle  is : %s" % parsedArticle)
-            articleDict = parsedArticle.wikiDict
+            # articleDict = parsedArticle.wikiDict
             jsonifiedArticle = json.dumps(articleDict)
-            createNewWikipediaArticle(self.nameWithoutFragment, jsonifiedArticle)
+            createNewWikipediaArticle(
+                self.nameWithoutFragment, jsonifiedArticle)
             app.logger.info("Commit successful")
-            app.logger.info("Checking if article got commited :  %s" %
-                            (getWikipediaArticleDataFirst(self.nameWithoutFragment)).articleDict)
-            articleFragment = articleDict[self.wikipediaArticleFragment]
-            articleContents = [i for i in articleDict]
-            app.logger.info("article contents list is %s" % articleContents)
-            return ''.join(articleFragment), articleContents
+            app.logger.info("Checking if article got commited :  %s" % (
+                getWikipediaArticleDataFirst(self.nameWithoutFragment)).articleDict)
+            self.articleFragment = ''.join(
+                articleDict[self.wikipediaArticleFragment][0])
+            self.articleContentsList = [[contentName,articleDict[contentName][1]] for contentName in articleDict]
+            app.logger.info("article contents list is %s" %
+                            articleContentsList)
+            self.articleFragmentLength = len(self.articleFragment)
+            app.logger.debug("articleFragmentLength is %s" %
+                             self.articleFragmentLength)
+
         except Exception as e:
             app.logger.info("error in get wiki : %s" % e)
             return str(e)
@@ -158,9 +186,12 @@ class methodsForTTS():
             app.logger.info("Inside textToSpeech")
             wikilinkData = getAllWikiLinksDataFirst(self.nameToSaveWith)
             if wikilinkData is None:
-                app.logger.info("articleLocation is for combined path : %s" % self.filename)
-                mediaLocation = GoogleTextToSpeech(convertThisArticleToSpeech, self.filename)
-                createNewAllWikiLink(self.nameToSaveWith, mediaLocation, convertThisArticleToSpeech)
+                app.logger.info(
+                    "articleLocation is for combined path : %s" % self.filename)
+                mediaLocation = GoogleTextToSpeech(
+                    convertThisArticleToSpeech, self.filename)
+                createNewAllWikiLink(self.nameToSaveWith,
+                                     mediaLocation, convertThisArticleToSpeech)
                 return mediaLocation
             media = getAllWikiLinksDataFirst(self.nameToSaveWith)
             return media.location

@@ -32,11 +32,13 @@ class WikipediaParser():
         self.wikiSectionTitles = []
         self.wikiParas = []
         self.wikiIntro = []
-        self.acceptedTags = {'p', 'ul', 'dl', 'ol', 'blockquote', 'h2', 'h3', 'h4', 'h5', 'h6'}
+        self.acceptedTags = {'p', 'ul', 'dl', 'ol',
+                             'blockquote', 'h2', 'h3', 'h4', 'h5', 'h6'}
         self.htags = ['h2', 'h3', 'h4', 'h5', 'h6']
         self.specialTags = ['li', 'dd']
         self.ctr = 0
         self.wikiDict = {}
+        self.articleTotalCharacterCount = 0
 
     def getContentTitles(self):
         """Get different sections Titles in the wikipedia article 
@@ -76,7 +78,8 @@ class WikipediaParser():
 
             self.wikiSections = self.soup.find(id="toc").find_all('li')
             for section in self.wikiSections:
-                self.wikiSectionTitles.append(section.find_all('span')[1].string)
+                self.wikiSectionTitles.append(
+                    section.find_all('span')[1].string)
             return self.wikiSectionTitles
         except:
             return "none find"
@@ -119,7 +122,10 @@ class WikipediaParser():
         for i in self.wikiParas[self.ctr:]:
             tag = i.name
             if tag != 'p':
-                self.wikiDict[''] = self.title + '. ' + ''.join(self.wikiIntro)
+                joinedList = ''.join(self.wikiIntro)
+                articleCharacterCount = len(joinedList)
+                self.articleTotalCharacterCount += articleCharacterCount
+                self.wikiDict[''] = [self.title + '. ' + joinedList, articleCharacterCount]
                 return ''.join(self.wikiIntro)
             else:
                 self.wikiIntro.append(self.htmlToPlain(i))
@@ -140,7 +146,8 @@ class WikipediaParser():
                 return l
             elif tag == 'blockquote':
                 # print(self.htmlToPlain(i.p))
-                l.append("I quote what they said .:" + self.htmlToPlain(i.p) + ". Quote end.")
+                l.append("I quote what they said .:" +
+                         self.htmlToPlain(i.p) + ". Quote end.")
                 self.ctr += 1
             else:
                 l.append(self.htmlToPlain(i) + '.')
@@ -170,7 +177,8 @@ class WikipediaParser():
 
                     if cont.string is not None:
                         l.append(cont.string)
-                l.append('.')  # To put a full stop after a list item this will make speech pause
+                # To put a full stop after a list item this will make speech pause
+                l.append('.')
             elif i.string is None or tag == 'sup':
                 pass
             elif tag in validInsidePara or tag is None:
@@ -223,9 +231,13 @@ class WikipediaParser():
                 ptr = self.ctr
             else:
                 l = self.parseParas()
+               
                 if l is not None:
-                    self.wikiDict[currentTitle] = (
-                            "%s. \n" % currentTitle + ''.join(l))
+                    joinedList = ''.join(l)
+                    articleCharacterCount = len(joinedList)
+                    self.articleTotalCharacterCount +=articleCharacterCount
+                    self.wikiDict[currentTitle] = [(
+                            "%s. \n" % currentTitle + joinedList),articleCharacterCount]
                 ptr = self.ctr
         return self.wikiDict
 
@@ -235,6 +247,7 @@ class WikipediaParser():
         self.getAllContentTags()
         self.getIntroParas()
         self.getTitlesContent()
+         
 
 
 def testThisUrl(url):
@@ -243,7 +256,8 @@ def testThisUrl(url):
     purl = urlparse(url)
     wikipediaArticlePath = purl.path
     wikipediaArticleFragment = ' '.join(unquote(purl.fragment).split('_'))
-    nameToSaveWith = unquote(str('_'.join(purl.path.split('/')) + '#' + purl.fragment))
+    nameToSaveWith = unquote(
+        str('_'.join(purl.path.split('/')) + '#' + purl.fragment))
     nameWithoutFragment = str('_'.join(purl.path.split('/')))
     print(purl)
     print(wikipediaArticlePath)
@@ -251,25 +265,25 @@ def testThisUrl(url):
     print(nameToSaveWith)
     print(nameWithoutFragment)
     print(article.wikiDict[wikipediaArticleFragment])
+    print(article.articleTotalCharacterCount)
+    print([[i,article.wikiDict[i][-1]] for i in article.wikiDict])
+    print(sum([article.wikiDict[i][-1] for i in article.wikiDict]) == article.articleTotalCharacterCount)
+
     print('_________________________________________________________________________________________________________-')
     return article.wikiDict[wikipediaArticleFragment]
 
 
 def testing():
-    url1 = "https://en.wikipedia.org/wiki/Anarchy#French_Revolution_(1789%E2%80%931799)"
-    url2 = "https://en.wikipedia.org/wiki/Anarchy#Immanuel_Kant"
-    url3 = "https://en.wikipedia.org/wiki/The_Devil%27s_Whore#Cast"
-    url4 = "https://en.wikipedia.org/wiki/Wikipedia"
-    url5 = "https://en.wikipedia.org/wiki/The_Seven_Deadly_Sins_(manga)"
-    url6 = "https://en.wikipedia.org/wiki/Seven_deadly_sins"
-    url7 = "https://hi.wikipedia.org/wiki/%E0%A4%B0%E0%A4%BE%E0%A4%AE%E0%A4%BE%E0%A4%AF%E0%A4%A3"
-    testThisUrl(url1)
-    testThisUrl(url2)
-    testThisUrl(url3)
-    testThisUrl(url4)
-    testThisUrl(url5)
-    testThisUrl(url6)
-    testThisUrl(url7)
+    urls = ["https://en.wikipedia.org/wiki/Anarchy#French_Revolution_(1789%E2%80%931799)"
+            "https://en.wikipedia.org/wiki/Anarchy#Immanuel_Kant",
+            "https://en.wikipedia.org/wiki/The_Devil%27s_Whore#Cast",
+            "https://en.wikipedia.org/wiki/Wikipedia",
+            "https://en.wikipedia.org/wiki/The_Seven_Deadly_Sins_(manga)",
+            "https://en.wikipedia.org/wiki/Seven_deadly_sins",
+            "https://hi.wikipedia.org/wiki/%E0%A4%B0%E0%A4%BE%E0%A4%AE%E0%A4%BE%E0%A4%AF%E0%A4%A3", 
+            ]
+    for url in urls:
+        testThisUrl(url)
 
 
 if __name__ == '__main__':

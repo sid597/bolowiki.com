@@ -36,6 +36,8 @@ class WikipediaParser():
         self.specialTags = ['li', 'dd']
         self.ctr = 0
         self.wikiDict = {}
+        self.articleTotalCharacterCount = 0
+
 
     def getContentTitles(self):
         """Get different sections Titles in the wikipedia article 
@@ -119,7 +121,10 @@ class WikipediaParser():
         for i in self.wikiParas[self.ctr:]:
             tag = i.name
             if tag != 'p':
-                self.wikiDict[''] = self.title + '. ' + ''.join(self.wikiIntro)
+                joinedList = ''.join(self.wikiIntro)
+                articleCharacterCount = len(joinedList)
+                self.articleTotalCharacterCount += articleCharacterCount
+                self.wikiDict[''] = [self.title + '. ' + joinedList, articleCharacterCount]
                 return ''.join(self.wikiIntro)
             else:
                 self.wikiIntro.append(self.htmlToPlain(i))
@@ -224,8 +229,11 @@ class WikipediaParser():
             else:
                 l = self.parseParas()
                 if l is not None:
-                    self.wikiDict[currentTitle] = (
-                            "%s. \n" % currentTitle + ''.join(l))
+                    joinedList = ''.join(l)
+                    articleCharacterCount = len(joinedList)
+                    self.articleTotalCharacterCount += articleCharacterCount
+                    self.wikiDict[currentTitle] = [(
+                            "%s. \n" % currentTitle + joinedList),articleCharacterCount]
                 ptr = self.ctr
         return self.wikiDict
 
@@ -235,3 +243,4 @@ class WikipediaParser():
         self.getAllContentTags()
         self.getIntroParas()
         self.getTitlesContent()
+        return self.wikiDict, self.articleTotalCharacterCount
