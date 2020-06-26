@@ -4,10 +4,26 @@ from flask import current_app as app
 from google.cloud import texttospeech
 
 
-def GoogleTextToSpeech(textToConvert, nameToSaveWith):
+def GoogleTextToSpeech(textToConvert, nameToSaveWith, translateLanguage):
+    languageSettings = {'hi':
+                        {
+                            'language_code': 'hi-IN',
+                            'ssml_gender': texttospeech.SsmlVoiceGender.MALE,
+                            'speaking_rate': 0.85
+
+                        },
+
+                        'en': {
+                            'language_code': 'en-US',
+                            'ssml_gender': texttospeech.SsmlVoiceGender.MALE,
+                            'speaking_rate': 1
+
+                        }, }
     app.logger.info("Inside GoogleTextToSpeech")
     # print(textToConvert)
-    app.logger.info('Text which is to be converted to speech is %s' % textToConvert)
+    app.logger.info(
+        'Text which is to be converted to speech is %s' % textToConvert)
+
     # Instantiates a client
     client = texttospeech.TextToSpeechClient()
 
@@ -17,12 +33,14 @@ def GoogleTextToSpeech(textToConvert, nameToSaveWith):
     # Build the voice request, select the language code ("en-US") and the ssml
     # voice gender ("neutral")
     voice = texttospeech.VoiceSelectionParams(
-        language_code="en-US", ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL
+        language_code=languageSettings[translateLanguage]['language_code'],
+        ssml_gender=languageSettings[translateLanguage]['ssml_gender']
     )
 
     # Select the type of audio file you want returned
     audio_config = texttospeech.AudioConfig(
-        audio_encoding=texttospeech.AudioEncoding.MP3
+        audio_encoding=texttospeech.AudioEncoding.MP3,
+        speaking_rate=languageSettings[translateLanguage]['speaking_rate']
     )
 
     # Perform the text-to-speech request on the text input with the selected
