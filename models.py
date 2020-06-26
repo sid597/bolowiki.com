@@ -1,5 +1,4 @@
 from flask_sqlalchemy import SQLAlchemy
-from flask import current_app as app
 
 db = SQLAlchemy()
 
@@ -29,4 +28,3 @@ class AllWikiLinks(db.Model):
     wikiLink = db.Column(db.String(200))
     location = db.Column(db.String(500))
     text = db.Column(db.Text(50000))
-
