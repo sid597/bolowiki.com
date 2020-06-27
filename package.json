@@ -1,0 +1,28 @@
+{
+  "name": "don-treadlisten",
+  "version": "1.0.0",
+  "description": "A webapp to translate text to speech",
+  "main": "helper_templates/layout/header.html",
+  "scripts": {
+    "test": "npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sid597/Don-tReadListen.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sid597/Don-tReadListen/issues"
+  },
+  "homepage": "https://github.com/sid597/Don-tReadListen#readme",
+  "devDependencies": {
+    "eslint": "^7.3.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.21.2"
+  },
+  "dependencies": {
+    "eslint-plugin-html": "^6.0.2"
+  }
+}
