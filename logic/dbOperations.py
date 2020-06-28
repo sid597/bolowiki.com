@@ -35,14 +35,19 @@ def getAllWikiLinksDataAll(linksNameTosearchWith=''):
 
 def createNewWikipediaArticle(articleNameTosaveWith, articleDictToSave):
     newWikiArticle = WikipediaArticles(
-        articleName=articleNameTosaveWith, articleDict=articleDictToSave)
+                                       articleName=articleNameTosaveWith,
+                                       articleDict=articleDictToSave
+                                       )
     db.session.add(newWikiArticle)
     db.session.commit()
 
 
 def createNewAllWikiLink(articleNameTosaveWith, articleLocationToSaveWhere, textToSave):
-    newWikiLinkWithFragment = AllWikiLinks(wikiLink=articleNameTosaveWith, location=articleLocationToSaveWhere,
-                                           text=textToSave)
+    newWikiLinkWithFragment = AllWikiLinks(
+                                           wikiLink=articleNameTosaveWith,
+                                           location=articleLocationToSaveWhere,
+                                           text=textToSave
+                                           )
     db.session.add(newWikiLinkWithFragment)
     db.session.commit()
 
@@ -67,7 +72,7 @@ class methodsForTTS():
     """Methods used for text-to-speech
     """
 
-    def __init__(self, username, path, fragment=''):
+    def __init__(self, username, path, articleLanguage, wikipediaNetLoc, fragment=''):
         self.currentUserUsername = username
         self.wikipediaArticlePath = path
         self.wikipediaArticleFragment = ' '.join(unquote(fragment).split('_'))
@@ -80,6 +85,8 @@ class methodsForTTS():
         self.articleContentsList = None
         self.articleTotalCharacterCount = 0
         self.articleFragmentLength = 0
+        self.articleLanguage = articleLanguage
+        self.wikipediaNetLoc = wikipediaNetLoc
 
     def orchestrator(self):
         app.logger.info("Inside orchestrator")
@@ -130,7 +137,7 @@ class methodsForTTS():
                     "link is already there in user's wiki link BUT HOW CAN THIS BE ? ")
 
         except Exception as e:
-            app.logger.info("error in addToUsersWikiLinks : %s" % e)
+            app.logger.error("error in addToUsersWikiLinks : %s" % e)
             return str(e)
 
     def getWikipediaArticleFragment(self):
@@ -145,15 +152,16 @@ class methodsForTTS():
                 self.articleFragment = ''.join(
                     articleDict[self.wikipediaArticleFragment][0])
                 app.logger.info("Got article fragment ")
-                app.logger.info("article fragment is %s" % self.articleFragment)
+                app.logger.info("article fragment is %s" %
+                                self.articleFragment)
                 self.articleFragmentLength = len(self.articleFragment)
                 app.logger.debug("articleFragmentLength is %s" %
-                             self.articleFragmentLength)
-                
+                                 self.articleFragmentLength)
+
                 self.articleContentsList = [i for i in articleDict]
                 app.logger.info("article contents list is %s" %
                                 articleContentsList)
-            wikiUrl = 'https://en.wikipedia.org' + self.wikipediaArticlePath
+            wikiUrl = self.wikipediaNetLoc + self.wikipediaArticlePath
             app.logger.info("wikipedia url is : %s" % wikiUrl)
             parsedArticle = WikipediaParser(wikiUrl)
             articleDict, articleTotalCharacterCount = parsedArticle.instantiate()
@@ -166,11 +174,11 @@ class methodsForTTS():
             createNewWikipediaArticle(
                 self.nameWithoutFragment, jsonifiedArticle)
             app.logger.info("Commit successful")
-            app.logger.info("Checking if article got commited :  %s" % (
-                getWikipediaArticleDataFirst(self.nameWithoutFragment)).articleDict)
+            # app.logger.info("Checking if article got commited :  %s" % (
+            #     getWikipediaArticleDataFirst(self.nameWithoutFragment)).articleDict)
             self.articleFragment = ''.join(
                 articleDict[self.wikipediaArticleFragment][0])
-            self.articleContentsList = [[contentName,articleDict[contentName][1]] for contentName in articleDict]
+            self.articleContentsList = [[contentName, articleDict[contentName][1]] for contentName in articleDict]
             app.logger.info("article contents list is %s" %
                             articleContentsList)
             self.articleFragmentLength = len(self.articleFragment)
@@ -178,7 +186,7 @@ class methodsForTTS():
                              self.articleFragmentLength)
 
         except Exception as e:
-            app.logger.info("error in get wiki : %s" % e)
+            app.logger.error("error in get wiki : %s" % e)
             return str(e)
 
     def textToSpeech(self, convertThisArticleToSpeech):
@@ -189,14 +197,14 @@ class methodsForTTS():
                 app.logger.info(
                     "articleLocation is for combined path : %s" % self.filename)
                 mediaLocation = GoogleTextToSpeech(
-                    convertThisArticleToSpeech, self.filename)
+                    convertThisArticleToSpeech, self.filename, self.articleLanguage)
                 createNewAllWikiLink(self.nameToSaveWith,
                                      mediaLocation, convertThisArticleToSpeech)
                 return mediaLocation
             media = getAllWikiLinksDataFirst(self.nameToSaveWith)
             return media.location
         except Exception as e:
-            app.logger.info("error in get wiki : %s" % e)
+            app.logger.error("error in get wiki : %s" % e)
             return str(e)
 
 

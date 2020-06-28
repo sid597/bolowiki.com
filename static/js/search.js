@@ -249,6 +249,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
     const data = new FormData();
     data.append('wikipediaLink', articleWikiLink);
+    data.append('articleLanguage', queryLanguage);
     console.debug(`data is ${data}`);
     // request.setRequestHeader("Content-type", "application/json")
     request.send(data);
