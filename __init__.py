@@ -76,17 +76,19 @@ def login():
             app.logger.info("request  is %s" % request)
 
             app.logger.info("login request form is %s" % request.form)
-            data = User.query.filter_by(username="%s" % thwart(request.form['username'])).first()
+            app.logger.info('thwarted username is %s' % thwart(request.form['username']))
+            user = getUserDataFirst(thwart(request.form['username']))
+            app.logger.info('user info received from db is %s' % user)
+            UserPassword = user.password
+            
+            app.logger.info(sha256_crypt.verify(request.form['password'], UserPassword))
 
-            passwd = data.password
-            app.logger.info(sha256_crypt.verify(request.form['password'], passwd))
-
-            if sha256_crypt.verify(request.form['password'], passwd):
+            if sha256_crypt.verify(request.form['password'], UserPassword):
                 session['logged_in'] = True
                 session['username'] = request.form['username']
                 app.logger.info("You are now logged in")
                 flash("You are now logged in")
-                return redirect(url_for('homepage'))
+                return redirect(url_for('dashboard'))
             else:
                 app.logger.info("Invalid credentials ")
                 error = "Invalid credentials, try again."
