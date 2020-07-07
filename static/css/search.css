@@ -155,15 +155,24 @@ background-color: transparent;
 
 @media (max-width:475px){
   #mainDiv,#searchMainDiv{
-    width:334px;
+    width:100%;
     margin:0 auto;
   }
   
   #searchInputBox{
     width: 140px;
+  }  
+}
+
+@media (max-width:400px){
+  #mainDiv,#searchMainDiv{
+    width:100%;
+    margin:0 auto;
   }
   
-  }
-
+  #searchInputBox{
+    width: 109px;
+  }  
+}
 
 
