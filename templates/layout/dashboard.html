@@ -1,22 +1,53 @@
-{%extends "layout/index.html" %} {%block body%}
+{%extends "layout/index.html" %} 
+{%block body%}
+<div class="alert alert-secondary" role="alert">
+  <ul class="nav nav-pills" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <a
+        class="nav-link active"
+        id="search-tab"
+        data-toggle="tab"
+        href="#search"
+        role="tab"
+        aria-controls="search"
+        aria-selected="true"
+        >Search Wiki</a
+      >
+    </li>
+    <li class="nav-item" role="presentation">
+      <a
+        class="nav-link"
+        id="translate-tab"
+        data-toggle="tab"
+        href="#translate"
+        role="tab"
+        aria-controls="translate"
+        aria-selected="false"
+        >Translate</a
+      >
+    </li>
+  </ul>
+</div>
 
-<head>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script src="{{ url_for('static', filename='js/convert.js')}}"></script>
-</head>
-<form>
-  <div class="form-group">
-    <label >Example textarea</label>
-    <textarea
-      class="form-control"
-      id="tts"
-      rows="3"
-    ></textarea>
+<!-- Tab Panes -->
+<div class="tab-content">
+  <div
+    class="tab-pane fade show active"
+    id="search"
+    role="tabpanel"
+    aria-labelledby="search-tab"
+  >
+    {%include"/helper_templates/search/main.html"%}
   </div>
-  <button type="submit" class="btn btn-primary">Submit</button>
-</form>
-<div>
-    <p id="display"></p>
+
+  <div
+    class="tab-pane fade"
+    id="translate"
+    role="tabpanel"
+    aria-labelledby="translate-tab"
+  >
+    Web
+  </div>
 </div>
 
 {%endblock%}

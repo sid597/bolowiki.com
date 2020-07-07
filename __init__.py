@@ -55,7 +55,7 @@ def homepage():
 @login_required
 def dashboard():
     app.logger.info("Inside dashboard")
-    return render_template("/layout/dashboard1.html")
+    return render_template("/layout/dashboard.html")
 
 
 @app.errorhandler(404)
