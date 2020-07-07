@@ -1,12 +1,12 @@
-{% extends "layout/header.html"  %} 
+{% extends "layout/index.html"  %} 
 
 {%block body%}
 
-<div class="container">
+<div class="container ">
   <br />
   <h4>Please Login</h4>
   <br />
-  <form action="" method="POST">
+  <form action="" method="POST" class="loginForm">
     <div class="form-group">
       <label for="exampleInputEmail1">Username</label>
       <input
@@ -31,5 +31,12 @@
 
   <p>{{error}}</p>
 </div>
+
+<style>
+  .loginForm > * {
+    margin: 20px;
+  }
+</style>
+
 
 {%endblock%}

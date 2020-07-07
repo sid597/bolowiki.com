@@ -2,7 +2,7 @@
   "name": "don-treadlisten",
   "version": "1.0.0",
   "description": "A webapp to translate text to speech",
-  "main": "helper_templates/layout/header.html",
+  "main": "helper_templates/layout/index.html",
   "scripts": {
     "test": "npm run test"
   },

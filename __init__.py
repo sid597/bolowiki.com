@@ -45,7 +45,7 @@ def homepage():
             # return redirect(url_for('dashboard'))
         else:
             app.logger.info("User is NOT logged in")
-        return render_template('layout/main.html')
+        return render_template('layout/homepage.html')
     except Exception as e:
         return str(e)
 
@@ -55,7 +55,7 @@ def homepage():
 @login_required
 def dashboard():
     app.logger.info("Inside dashboard")
-    return render_template("/layout/dashboard.html")
+    return render_template("/layout/dashboard1.html")
 
 
 @app.errorhandler(404)

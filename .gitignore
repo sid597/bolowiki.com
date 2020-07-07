@@ -1,6 +1,6 @@
 build.sh
 dbconnect.py
 *.pyc
-
+venv/
 *.log
 node_modules/
