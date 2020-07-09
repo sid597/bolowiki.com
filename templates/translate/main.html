@@ -1,0 +1,45 @@
+<link rel="stylesheet" href={{url_for('static', filename="css/translate.css")}}>
+<script src={{url_for('static', filename='js/translate/translate.js')}}></script>
+<div class="card border-info">
+  <div class="card-header">
+    <!-- <div class="btn-group" role="group" aria-label="Basic example"> -->
+      <button type="button" class="btn btn-outline-secondary" id="autoDetectOption">
+        AUTO-DETECT
+      </button>
+      <button type="button" class="btn btn-outline-secondary " id="hindi">HINDI</button>
+      <button type="button" class="btn btn-outline-secondary" id="english">
+        ENGLISH-IN
+      </button>
+      <button
+        type="button"
+        class="btn btn-outline-secondary dropdown-toggle"
+        data-toggle="dropdown"
+        aria-expanded="false"
+      >
+        Others
+      </button>
+      <ul class="dropdown-menu" id="languageSelectDropdown">
+        dsf
+      </ul>
+    </div>
+  <!-- </div> -->
+
+  <div class="card-body" id="translateCardBody">
+    Type text to translate :
+    <div class="textareaElement" contenteditable id="textToTranslate">
+     
+    </div>
+  </div>
+  <!-- <div class="card-footer">
+    <button type="button" class="btn btn-dark">Translate</button>
+  </div> -->
+</div>
+
+<!-- Card for the translated text -->
+
+<div class="card border-info mb-3"  >
+  <div class="card-header">Translated Text</div>
+  <div class="card-body" id="translatedCardBody">
+    
+  </div>
+</div>

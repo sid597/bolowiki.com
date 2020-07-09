@@ -247,6 +247,11 @@ def getWiki():
         app.logger.info("error in get wiki : %s" % e)
         return str(e)
 
+@app.route('/translate/', methods=["POST", "GET"])
+def translate():
+    data = request.get_json()
+    print(data)
+    return jsonify(data)
 
 @app.route('/logout/')
 @login_required
