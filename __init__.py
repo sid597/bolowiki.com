@@ -10,6 +10,7 @@ from pymysql import escape_string as thwart
 from wtforms import Form, validators, PasswordField, TextField
 
 from logic.dbOperations import *
+from translator import translate
 
 app = Flask(__name__, template_folder='templates')
 logging.basicConfig(filename='error.log', level=logging.DEBUG)
@@ -76,12 +77,14 @@ def login():
             app.logger.info("request  is %s" % request)
 
             app.logger.info("login request form is %s" % request.form)
-            app.logger.info('thwarted username is %s' % thwart(request.form['username']))
+            app.logger.info('thwarted username is %s' %
+                            thwart(request.form['username']))
             user = getUserDataFirst(thwart(request.form['username']))
             app.logger.info('user info received from db is %s' % user)
             UserPassword = user.password
-            
-            app.logger.info(sha256_crypt.verify(request.form['password'], UserPassword))
+
+            app.logger.info(sha256_crypt.verify(
+                request.form['password'], UserPassword))
 
             if sha256_crypt.verify(request.form['password'], UserPassword):
                 session['logged_in'] = True
@@ -139,10 +142,10 @@ def register_page():
             else:
 
                 createNewUser(
-                              username=thwart(username),
-                              email=thwart(email),
-                              password=password
-                              )
+                    username=thwart(username),
+                    email=thwart(email),
+                    password=password
+                )
 
                 flash("Thanks for registering!")
                 gc.collect()
@@ -247,11 +250,18 @@ def getWiki():
         app.logger.info("error in get wiki : %s" % e)
         return str(e)
 
+
 @app.route('/translate/', methods=["POST", "GET"])
 def translate():
     data = request.get_json()
-    print(data)
-    return jsonify(data)
+    srcLanguage = data.srcLanguage
+    destLanguage = data.destLanguage
+    textToTranlate = data['textToTranslate']
+    translatedText = translate()
+    returnData = {'translatedTextResponse': translatedText,
+                  'textWhichWasToBeTranslated': data['textToTranslate']}
+    return jsonify(returnData)
+
 
 @app.route('/logout/')
 @login_required
