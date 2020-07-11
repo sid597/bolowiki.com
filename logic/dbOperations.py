@@ -4,7 +4,7 @@ from urllib.parse import unquote
 
 from flask import current_app as app
 
-from logic.tts import GoogleTextToSpeech
+from logic.textToSpeech import GoogleTextToSpeech
 from logic.wikipedia import WikipediaParser
 from models import *
 
@@ -35,19 +35,19 @@ def getAllWikiLinksDataAll(linksNameTosearchWith=''):
 
 def createNewWikipediaArticle(articleNameTosaveWith, articleDictToSave):
     newWikiArticle = WikipediaArticles(
-                                       articleName=articleNameTosaveWith,
-                                       articleDict=articleDictToSave
-                                       )
+        articleName=articleNameTosaveWith,
+        articleDict=articleDictToSave
+    )
     db.session.add(newWikiArticle)
     db.session.commit()
 
 
 def createNewAllWikiLink(articleNameTosaveWith, articleLocationToSaveWhere, textToSave):
     newWikiLinkWithFragment = AllWikiLinks(
-                                           wikiLink=articleNameTosaveWith,
-                                           location=articleLocationToSaveWhere,
-                                           text=textToSave
-                                           )
+        wikiLink=articleNameTosaveWith,
+        location=articleLocationToSaveWhere,
+        text=textToSave
+    )
     db.session.add(newWikiLinkWithFragment)
     db.session.commit()
 
@@ -178,7 +178,8 @@ class methodsForTTS():
             #     getWikipediaArticleDataFirst(self.nameWithoutFragment)).articleDict)
             self.articleFragment = ''.join(
                 articleDict[self.wikipediaArticleFragment][0])
-            self.articleContentsList = [[contentName, articleDict[contentName][1]] for contentName in articleDict]
+            self.articleContentsList = [
+                [contentName, articleDict[contentName][1]] for contentName in articleDict]
             app.logger.info("article contents list is %s" %
                             articleContentsList)
             self.articleFragmentLength = len(self.articleFragment)
@@ -197,9 +198,16 @@ class methodsForTTS():
                 app.logger.info(
                     "articleLocation is for combined path : %s" % self.filename)
                 mediaLocation = GoogleTextToSpeech(
-                    convertThisArticleToSpeech, self.filename, self.articleLanguage)
-                createNewAllWikiLink(self.nameToSaveWith,
-                                     mediaLocation, convertThisArticleToSpeech)
+                                                   convertThisArticleToSpeech,
+                                                   self.filename,
+                                                   self.articleLanguage,
+                                                   voiceGender='MALE'
+                                                   )
+                createNewAllWikiLink(
+                                    self.nameToSaveWith,
+                                    mediaLocation,
+                                    convertThisArticleToSpeech
+                                    )
                 return mediaLocation
             media = getAllWikiLinksDataFirst(self.nameToSaveWith)
             return media.location
@@ -223,7 +231,7 @@ https://en.wikipedia.org/wiki/Moore,_Indiana
                        
 How to check if test passed ?
 check the article on wiki or in print console and the audio file created
-in $ (os.cpwd())/static/tts/                        
+in $ (os.cpwd())/static/textToSpeech/                        
 """
 
 
@@ -231,9 +239,9 @@ def testTTS():
     path = '/wiki/Unincorporated_area'
     fragment = ''
     user = 'qwer'
-    newtts = methodsForTTS(user, path, fragment)
-    print(newtts.nameToSaveWith)
-    art = newtts.getWikipediaArticleFragment()
+    newtextToSpeech = methodsForTTS(user, path, fragment)
+    print(newtextToSpeech.nameToSaveWith)
+    art = newtextToSpeech.getWikipediaArticleFragment()
     print(art)
-    newtts.textToSpeech(art)
-    newtts.addToUsersWikiLinks()
+    newtextToSpeech.textToSpeech(art)
+    newtextToSpeech.addToUsersWikiLinks()
