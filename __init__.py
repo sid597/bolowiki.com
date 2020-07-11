@@ -10,7 +10,8 @@ from pymysql import escape_string as thwart
 from wtforms import Form, validators, PasswordField, TextField
 
 from logic.dbOperations import *
-from translator import translate
+from translate.translator import _translate
+from pprint import pprint
 
 app = Flask(__name__, template_folder='templates')
 logging.basicConfig(filename='error.log', level=logging.DEBUG)
@@ -252,16 +253,38 @@ def getWiki():
 
 
 @app.route('/translate/', methods=["POST", "GET"])
+@login_required
 def translate():
-    data = request.get_json()
-    srcLanguage = data.srcLanguage
-    destLanguage = data.destLanguage
-    textToTranlate = data['textToTranslate']
-    translatedText = translate()
-    returnData = {'translatedTextResponse': translatedText,
-                  'textWhichWasToBeTranslated': data['textToTranslate']}
-    return jsonify(returnData)
+    try:
+        data = request.get_json()
+        srcLanguage = data['srcLanguage']
+        destLanguage = data['destLanguage']
+        textToTranlate = data['textToTranslate']
+        app.logger.info("Text to translate is : %s " % data)
+        translatedText = _translate(
+            textToTranlate,
+            src=srcLanguage,
+            dest=destLanguage)
+        app.logger.info("Translated Text is %s " % translatedText)
+        returnData = {'translatedTextResponse': translatedText,
+                      'textWhichWasToBeTranslated': data['textToTranslate']}
+        return jsonify(returnData)
+    except Exception as e:
+        return "noob"
+        # print(e)
+        app.logger.error('Error in translate :%s' % e)
 
+
+@app.route('/translateToSpeech/', methods=["POST", "GET"])
+@login_required
+def translateToSpeech():
+    data = request.get_json()
+    textToConvert = data['textToConvert']
+    nameToSaveWith = data['nameToSaveWith']
+    translateLanguage = data['translateLanguage']
+    voiceGender = data['voiceGender']
+    mediaLocation = GoogleTextToSpeech(textToConvert, nameToSaveWith, translateLanguage, voiceGender,)
+    return mediaLocation
 
 @app.route('/logout/')
 @login_required
