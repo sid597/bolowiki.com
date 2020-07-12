@@ -112,6 +112,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const textToTranslate = document.querySelector('#textToTranslate');
   const translatedCardBody = document.querySelector('#translatedCardBody');
   textareaElement.focus();
+
+  // Paste text as plain text in content editable
+  document.querySelector('[contenteditable]').addEventListener('paste', (event) => {
+    event.preventDefault();
+    document.execCommand('inserttext', false, event.clipboardData.getData('text/plain'));
+  });
+
+  // Translte the text which is added
+
   textToTranslate.addEventListener('input', () => {
     // console.log(e);
     const textToTranslateData = textToTranslate.innerHTML;
@@ -120,13 +129,15 @@ document.addEventListener('DOMContentLoaded', () => {
     request.open('POST', '/translate/');
     request.onload = () => {
       const responseData = JSON.parse(request.responseText);
-      console.log(responseData);
+      // console.log(` RESPONSE DATA IS : ${responseData.translatedTextResponse}`);
       translatedCardBody.innerHTML = responseData.translatedTextResponse;
     };
-    const data = JSON.stringify({ textToTranslate: textToTranslateData });
+    const data = JSON.stringify({ textToTranslate: textToTranslateData, srcLanguage: 'en', destLanguage: 'hi' });
     // console.log(data);
     request.setRequestHeader('Content-type', 'application/json');
-
     request.send(data);
+    // setTimeout(() => {
+    //   request.send(data);
+    // }, 200);
   });
 });
