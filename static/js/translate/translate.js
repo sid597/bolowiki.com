@@ -116,7 +116,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const micIcon = document.querySelector('#micIcon');
   const micIconCurrentStatus = document.querySelector('#micIconCurrentStatus');
   const micIconResult = document.querySelector('#micIconCurrentStatus');
+  const voiceSelectDropdownButton = document.querySelector('#voiceSelectDropdownButton');
+  const nameToSaveWith = document.querySelector('#nameToSaveWith');
   textareaElement.focus();
+
+  // Voice select Dropdown button
+  voiceSelectDropdownButton.textContent = 'Male  ';
+  document.querySelector('#demolist').addEventListener('click', (e) => {
+    console.log(e.target.textContent);
+    voiceSelectDropdownButton.textContent = `${e.target.textContent}  `;
+  });
 
   // Paste text as plain text in content editable
   document.querySelector('[contenteditable]').addEventListener('paste', (event) => {
@@ -160,8 +169,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const postData = JSON.stringify({
       textToConvert: textToTranslateData,
       translateLanguage: 'en-GB',
-      nameToSaveWith: 'sid_translate',
-      voiceGender: 'MALE',
+      nameToSaveWith: nameToSaveWith.value.length !== 0 ? nameToSaveWith.value : 'sid_translate',
+      voiceGender: voiceSelectDropdownButton.textContent,
     });
     request.setRequestHeader('Content-type', 'application/json');
     console.log(`Data to send for speech translation is ${postData}`);

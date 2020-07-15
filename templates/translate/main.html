@@ -74,10 +74,45 @@
 <div class="card border-info mb-3">
   <div class="card-header">Translated Text</div>
   <div class="card-body" id="translatedCardBody"></div>
+  <!-- Card footer for  -->
+  <div class="card-footer">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <!-- Select voice Gender -->
+      <div class="btn-group w-25">
+        <button type="button" class="btn btn-outline-dark w-75 mr-0">Voice Gender</button>
+        <button
+        id="voiceSelectDropdownButton"
+          type="button"
+          class="btn btn-outline-dark dropdown-toggle dropdown-toggle-split"
+          data-toggle="dropdown"
+          aria-expanded="true"
+        >
+            <!-- <span class="sr-only">Toggle Dropdown</span> -->
+        </button>
+        <ul
+          class="dropdown-menu"
+          id="demolist"
+          aria-labelledby="dropdownMenuButton"
+        >
+          <li><a class="dropdown-item" href="#">Female</a></li>
+          <li><a class="dropdown-item" href="#">Male</a></li>
+        </ul>
+      </div>
+      
+      <!-- Add fileName to save with  -->
+      <div class="btn-toolbar " role="toolbar" aria-label="Toolbar with button groups">
+        <div class="input-group ">
+          <input type="text" id="nameToSaveWith" class="form-control " placeholder="Audio file name" aria-label="Input group example" aria-describedby="btnGroupAddon">
+        </div>
+      </div>
+
+      <!-- Submit button for speech translation  -->
+      <button type="button" id="translateTextToSpeech" class="btn btn-info ">
+        Translate to speech
+      </button>
+    </nav>
+  </div>
 </div>
-<button type="button" id="translateTextToSpeech" class="btn btn-light">
-  Light
-</button>
 
 <!-- --------------------------------------------------------------- -->
 
