@@ -279,12 +279,20 @@ def translate():
 @login_required
 def translateToSpeech():
     data = request.get_json()
+    app.logger.info("Request to translate text to speech with data %s" % data)
     textToConvert = data['textToConvert']
     nameToSaveWith = data['nameToSaveWith']
     translateLanguage = data['translateLanguage']
     voiceGender = data['voiceGender']
-    mediaLocation = GoogleTextToSpeech(textToConvert, nameToSaveWith, translateLanguage, voiceGender,)
+    mediaLocation = GoogleTextToSpeech(textToConvert=textToConvert,
+                                       nameToSaveWith=nameToSaveWith,
+                                       translateLanguage=translateLanguage,
+                                       voiceGender=voiceGender,
+                                       convertType='translate'
+                                       )
+    app.logger.info("Text to speech request audio file location is : %s" % mediaLocation)
     return mediaLocation
+
 
 @app.route('/logout/')
 @login_required

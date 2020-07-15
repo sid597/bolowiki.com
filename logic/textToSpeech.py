@@ -1,10 +1,9 @@
 import os
-
 from flask import current_app as app
 from google.cloud import texttospeech
 
 
-def GoogleTextToSpeech(textToConvert, nameToSaveWith, translateLanguage, voiceGender,):
+def GoogleTextToSpeech(textToConvert, nameToSaveWith, translateLanguage, voiceGender, convertType):
     ssmlVoiceGender = {
         'MALE': texttospeech.SsmlVoiceGender.MALE,
         'FEMALE': texttospeech.SsmlVoiceGender.FEMALE
@@ -27,8 +26,9 @@ def GoogleTextToSpeech(textToConvert, nameToSaveWith, translateLanguage, voiceGe
                             'ssml_gender': ssmlVoiceGender[voiceGender],
                             'speaking_rate': 1
                         },
-                        'en-UK': {
-                            'language_code': 'en-UK',
+                        'en-GB': {
+                            'language_code': 'en-GB',
+                            'name' : "en-GB-Wavenet-D",
                             'ssml_gender': ssmlVoiceGender[voiceGender],
                             'speaking_rate': 1
                         },
@@ -62,8 +62,11 @@ def GoogleTextToSpeech(textToConvert, nameToSaveWith, translateLanguage, voiceGe
     response = client.synthesize_speech(
         input=synthesis_input, voice=voice, audio_config=audio_config
     )
-
-    saveDirectory = os.getcwd() + "/static/textToSpeech/"
+    if convertType == 'wiki':
+        saveDirectory = os.getcwd() + "/static/textToSpeech/"
+    else:
+        # TODO: change the location
+        saveDirectory = os.getcwd() + "/static/translate/"
     mediaLocation = saveDirectory + nameToSaveWith + ".mp3"
     app.logger.info("mediaLocation is going to be : %s " % mediaLocation)
     # The response's audio_content is binary.

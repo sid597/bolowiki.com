@@ -198,11 +198,12 @@ class methodsForTTS():
                 app.logger.info(
                     "articleLocation is for combined path : %s" % self.filename)
                 mediaLocation = GoogleTextToSpeech(
-                                                   convertThisArticleToSpeech,
-                                                   self.filename,
-                                                   self.articleLanguage,
-                                                   voiceGender='MALE'
-                                                   )
+                                                    textToConvert=convertThisArticleToSpeech,
+                                                    nameToSaveWith=self.filename,
+                                                    translateLanguage=self.articleLanguage,
+                                                    voiceGender='MALE',
+                                                    convertType='wiki'
+                                                    )
                 createNewAllWikiLink(
                                     self.nameToSaveWith,
                                     mediaLocation,
