@@ -178,8 +178,7 @@ class methodsForTTS():
             #     getWikipediaArticleDataFirst(self.nameWithoutFragment)).articleDict)
             self.articleFragment = ''.join(
                 articleDict[self.wikipediaArticleFragment][0])
-            self.articleContentsList = [
-                [contentName, articleDict[contentName][1]] for contentName in articleDict]
+            self.articleContentsList = [[contentName, articleDict[contentName][1]] for contentName in articleDict]
             app.logger.info("article contents list is %s" %
                             articleContentsList)
             self.articleFragmentLength = len(self.articleFragment)
@@ -232,7 +231,7 @@ https://en.wikipedia.org/wiki/Moore,_Indiana
                        
 How to check if test passed ?
 check the article on wiki or in print console and the audio file created
-in $ (os.cpwd())/static/textToSpeech/                        
+in $ (os.cpwd())/static/tts/                        
 """
 
 
