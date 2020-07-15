@@ -6,29 +6,58 @@
   border-style: none;
   padding: 10px;
   /* border: 1px solid; */
-
 }
+
 [contenteditable]:focus {
-    outline: 0px solid transparent;
+  outline: 0px solid transparent;
 }
 
-.card{
+.card {
   margin-top: 30px;
-  
 }
-.card-header{
+.card-header {
   font-family: roboto;
   font-size: 20px;
 }
 
-button{
+button {
   margin: 5px;
 }
 
-#translatedCardBody{
+#translatedCardBody {
   min-height: 187px;
 }
-/* #translateCardBody {
-  border: 1px solid black;
-  height: 100%;
-} */
+
+/* Styles for the mic Icon  */
+
+#micIcon {
+  display: flex;
+  margin-top: -5px;
+  align-items: stretch;
+  flex-direction: row;
+  flex: 0 0 auto;
+}
+#micIconDiv {
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  width: 44px;
+  line-height: 44px;
+  flex: 1 0 auto;
+  border-width: 0px;
+  border-style: initial;
+  border-color: initial;
+  border-image: initial;
+  background: transparent;
+  outline: none;
+  padding: 0px 8px;
+}
+#micIconSVGIcon {
+  height: 38px;
+  width: 34px;
+  vertical-align: middle;
+}
+/* Modal which is shown when micIcon is clicked */
+#micIconModal {
+  background-color: white;
+}
