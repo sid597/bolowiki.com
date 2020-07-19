@@ -12,6 +12,8 @@ from models import *
 def getUserDataFirst(currentUserUsername):
     return User.query.filter_by(username=currentUserUsername).first()
 
+def getUserRemainingLimit(currentUserUsername):
+    return User.query.filter_by(username=currentUserUsername).first().remainingLimit
 
 def getUserDataAll(currentUserUsername):
     return User.query.filter_by(username=currentUserUsername).first()
@@ -33,6 +35,11 @@ def getAllWikiLinksDataAll(linksNameTosearchWith=''):
     return AllWikiLinks.query.filter_by(wikiLink=linksNameTosearchWith).first()
 
 
+def setUserRemainingLimit(currentUserUsername, lengthOfTextToConvert):
+    user = getUserDataFirst(currentUserUsername)
+    user.remainingLimit = user.remainingLimit - lengthOfTextToConvert
+    db.session.commit()
+    
 def createNewWikipediaArticle(articleNameTosaveWith, articleDictToSave):
     newWikiArticle = WikipediaArticles(
         articleName=articleNameTosaveWith,

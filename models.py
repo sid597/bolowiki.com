@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.dialects.mysql import INTEGER
 
 db = SQLAlchemy()
 
@@ -13,6 +14,7 @@ class User(db.Model):
     tracking = db.Column(db.Text(32500))
     rank = db.Column(db.String(3))
     wikiLinks = db.Column(db.Text(32500), default='')
+    remainingLimit = db.Column(INTEGER(), default=20000)
 
 
 class WikipediaArticles(db.Model):

@@ -24,6 +24,7 @@ db.init_app(app)
 
 # Add a user
 
+# Decorators 
 
 def login_required(f):
     @wraps(f)
@@ -37,6 +38,16 @@ def login_required(f):
 
     return wrap
 
+def remainingCharacterLimitNotZero(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            remainingLimit = getRemainingLimit()
+            if remainingLimit > 0:
+                return f(*args, **kwargs)
+        flash("Your limit for voice conversion is over contact siddharthdv77@gmail.com for upgrade.")
+    return wrap
+
 
 @app.route('/')
 def homepage():
@@ -44,10 +55,10 @@ def homepage():
         app.logger.info("Inside homepage")
         if 'logged_in' in session:
             app.logger.info("User is logged in")
-            # return redirect(url_for('dashboard'))
+            return redirect(url_for('dashboard'))
         else:
             app.logger.info("User is NOT logged in")
-        return render_template('layout/homepage.html')
+            return render_template('layout/homepage.html')
     except Exception as e:
         return str(e)
 
@@ -160,10 +171,18 @@ def register_page():
     except Exception as e:
         return str(e)
 
+@app.route('/getRemainingLimit/', methods=['GET'])
+@login_required
+def getRemainingLimit():
+    username = session['username']
+    remainingLimit = getUserRemainingLimit(username)
+    return remainingLimit
+
 
 # app.logger.info("")
 @app.route('/converttospeech/', methods=['GET', 'POST'])
 # @login_required
+@remainingCharacterLimitNotZero
 def getWiki():
     """ Receive a request to convert the clicked link to audio
         check if link is present in AllWikiLinks
@@ -220,13 +239,16 @@ def getWiki():
                     fragment
                 )
                 mediaLocation, articleFragment, articleContentsList, articleFragmentLength, articalTotalLength = newTTS.orchestrator()
+                # TODO : Uncomment the following line
+                # setUserRemainingLimit(username, articleFragmentLength)
+
                 return jsonify({
                     'mediaLocation': mediaLocation + '.mp3',
                     'txt': articleFragment,
                     "success": True,
                     'articleContents': articleContentsList,
                     'articleFragmentLength': articleFragmentLength,
-                    'articalTotalLength': articalTotalLength
+                    'articalTotalLength': articalTotalLength, 
                 })
             else:
                 username = 'UserNotLoggedIn'
@@ -277,6 +299,7 @@ def translate():
 
 @app.route('/translateToSpeech/', methods=["POST", "GET"])
 @login_required
+@remainingCharacterLimitNotZero
 def translateToSpeech():
     data = request.get_json()
     app.logger.info("Request to translate text to speech with data %s" % data)
@@ -284,6 +307,7 @@ def translateToSpeech():
     nameToSaveWith = data['nameToSaveWith']
     translateLanguage = data['translateLanguage']
     voiceGender = data['voiceGender']
+    setUserRemainingLimit(session['username'], len(textToConvert))
     mediaLocation = GoogleTextToSpeech(textToConvert=textToConvert,
                                        nameToSaveWith=nameToSaveWith,
                                        translateLanguage=translateLanguage,
