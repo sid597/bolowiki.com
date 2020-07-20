@@ -4,7 +4,7 @@ import os
 from functools import wraps
 from urllib.parse import urlparse
 from flask_migrate import Migrate
-from flask import Flask, render_template, url_for, redirect, flash, request, session, jsonify
+from flask import Flask, render_template, url_for, redirect, flash, request, session, jsonify, Blueprint
 from passlib.hash import sha256_crypt
 from pymysql import escape_string as thwart
 from wtforms import Form, validators, PasswordField, TextField

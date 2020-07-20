@@ -1,4 +1,4 @@
-from .__init__ import app
+from heyWikiApp import app
 import os
 
 
