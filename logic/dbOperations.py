@@ -4,9 +4,9 @@ from urllib.parse import unquote
 
 from flask import current_app as app
 
-from logic.textToSpeech import GoogleTextToSpeech
-from logic.wikipedia import WikipediaParser
-from models import *
+from .textToSpeech import GoogleTextToSpeech
+from .wikipedia import WikipediaParser
+from ..models import *
 
 
 def getUserDataFirst(currentUserUsername):
