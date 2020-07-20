@@ -3,14 +3,14 @@ import logging
 import os
 from functools import wraps
 from urllib.parse import urlparse
-
+from flask_migrate import Migrate
 from flask import Flask, render_template, url_for, redirect, flash, request, session, jsonify
 from passlib.hash import sha256_crypt
 from pymysql import escape_string as thwart
 from wtforms import Form, validators, PasswordField, TextField
 
-from logic.dbOperations import *
-from translate.translator import _translate
+from .logic.dbOperations import *
+from .translate.translator import _translate
 from pprint import pprint
 
 app = Flask(__name__, template_folder='templates')
@@ -20,8 +20,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
 db.init_app(app)
-
-
+migrate = Migrate()
+migrate.init_app(app, db)
 # Add a user
 
 # Decorators 
