@@ -4,9 +4,9 @@ from urllib.parse import unquote
 
 from flask import current_app as app
 
-from .textToSpeech import GoogleTextToSpeech
-from .wikipedia import WikipediaParser
-from ..models import *
+from heyWikiApp.text_to_speech.textToSpeech import GoogleTextToSpeech
+from heyWikiApp.parse_wikipedia_article import WikipediaParser
+from heyWikiApp.models import *
 
 
 def getUserDataFirst(currentUserUsername):

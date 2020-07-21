@@ -5,12 +5,13 @@ import gc
 from flask import Flask, render_template, url_for, redirect, flash, request, session, jsonify, Blueprint
 
 # Imports from local packages
-from ..logic.dbOperations import setUserRemainingLimit, GoogleTextToSpeech
-from .utils import login_required, remainingCharacterLimitNotZero, _translate
+from ..dbOperations import setUserRemainingLimit, GoogleTextToSpeech
+from ..utils import login_required, remainingCharacterLimitNotZero
+from .utils import _translate
 
-bp = Blueprint('translate', __name__)
+translate_bp = Blueprint('translate_bp', __name__, url_prefix='/translate')
 
-@bp.route('/translate/', methods=["POST", "GET"])
+@translate_bp.route('/toText/', methods=["POST", "GET"])
 @login_required
 def translate():
     try:
@@ -33,7 +34,7 @@ def translate():
         # app.logger.error('Error in translate :%s' % e)
 
 
-@bp.route('/translateToSpeech/', methods=["POST", "GET"])
+@translate_bp.route('/toSpeech/', methods=["POST", "GET"])
 @login_required
 @remainingCharacterLimitNotZero
 def translateToSpeech():

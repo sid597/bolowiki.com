@@ -2,26 +2,26 @@
 import gc
 
 # External packages
-from flask import Flask, render_template, url_for, redirect, flash, request, session, jsonify, Blueprint
+from flask import render_template, url_for, redirect, flash, request, session, jsonify, Blueprint
 from passlib.hash import sha256_crypt
 from pymysql import escape_string as thwart
 from wtforms import Form, validators, PasswordField, TextField
 from flask import  current_app as app
 
 # Local packages
-from ..logic.dbOperations import  getUserDataFirst, createNewUser, getUserRemainingLimit
-from .utils import login_required, remainingCharacterLimitNotZero, getRemainingLimit
+from ..dbOperations import  getUserDataFirst, createNewUser, getUserRemainingLimit
+from ..utils import login_required, remainingCharacterLimitNotZero, getRemainingLimit
 
 
-bp = Blueprint('users', __name__)
+users_bp = Blueprint('users_bp', __name__)
 
-@bp.route('/login/', methods=['GET', 'POST'])
+@users_bp.route('/login/', methods=['GET', 'POST'])
 def login():
     error = ''
     try:
         print("Inside login")
         if 'logged_in' in session:
-            return redirect(url_for('homepage'))
+            return redirect(url_for('main_bp.homepage'))
         elif request.method == "POST":
             print("Inside login route ")
             print("request  is %s" % request)
@@ -30,7 +30,7 @@ def login():
             print('thwarted username is %s' %
                             thwart(request.form['username']))
             user = getUserDataFirst(thwart(request.form['username']))
-            print('user info received from db is %s' % user)
+            print('user info received from db is %s' % user.password)
             UserPassword = user.password
 
             print(sha256_crypt.verify(
@@ -41,7 +41,7 @@ def login():
                 session['username'] = request.form['username']
                 print("You are now logged in")
                 flash("You are now logged in")
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('main_bp.dashboard'))
             else:
                 print("Invalid credentials ")
                 error = "Invalid credentials, try again."
@@ -67,7 +67,7 @@ class RegistrationForm(Form):
     confirm = PasswordField('Repeat Password')
 
 
-@bp.route('/register/', methods=["GET", "POST"])
+@users_bp.route('/register/', methods=["GET", "POST"])
 def register_page():
     try:
         # print("Inside register_page  ")
@@ -75,7 +75,7 @@ def register_page():
         # print("username of user ---> %s" % form.username.data)
         if 'logged_in' in session:
             # print("Already logged in ")
-            return redirect(url_for('dashboard'))
+            return redirect(url_for('main_bp.dashboard'))
         elif request.method == "POST" and form.validate():
             username = form.username.data
             email = form.email.data
@@ -98,16 +98,16 @@ def register_page():
                 gc.collect()
                 session['logged_in'] = True
                 session['username'] = username
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('main_bp.dashboard'))
         return render_template("user_Management/register.html", form=form)
     except Exception as e:
         return str(e)
    
-@bp.route('/logout/')
+@users_bp.route('/logout/')
 @login_required
 def logout():
     # print("Inside logout")
     session.clear()
     flash("You have been logged out!")
     gc.collect()
-    return redirect(url_for('homepage'))
+    return redirect(url_for('main_bp.homepage'))

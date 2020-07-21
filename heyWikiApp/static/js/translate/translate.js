@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const textToTranslateData = textToTranslate.textContent;
     characterCount.innerHTML = textToTranslateData.length;
     const request = new XMLHttpRequest();
-    request.open('POST', '/translate/');
+    request.open('POST', '/translate/toText');
     request.onload = () => {
       const responseData = JSON.parse(request.responseText);
       translatedCardBody.innerHTML = responseData.translatedTextResponse;
@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const textToTranslateData = translatedCardBody.innerHTML;
     const request = new XMLHttpRequest();
     console.log('translateTextToSpeech clicked');
-    request.open('POST', '/translateToSpeech/');
+    request.open('POST', '/text_to_speech/translated_text/');
     request.onload = () => { };
     const postData = JSON.stringify({
       textToConvert: textToTranslateData,
