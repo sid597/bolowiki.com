@@ -8,7 +8,7 @@ def GoogleTextToSpeech(textToConvert, nameToSaveWith, translateLanguage, voiceGe
         'MALE': texttospeech.SsmlVoiceGender.MALE,
         'FEMALE': texttospeech.SsmlVoiceGender.FEMALE
     }
-    ssmlVoiceGender[voiceGender]
+
     languageSettings = {'hi':
                         {
                             'language_code': 'hi-IN',
@@ -76,9 +76,3 @@ def GoogleTextToSpeech(textToConvert, nameToSaveWith, translateLanguage, voiceGe
         # print('Audio content written to file "output.mp3"')
     return "../static/textToSpeech/" + nameToSaveWith
 
-
-# Test this by $ python3 textToSpeech.py
-# You should see a file helloworld.mp3 in you static directory
-
-if __name__ == '__main__':
-    GoogleTextToSpeech("art", 'helloworld')

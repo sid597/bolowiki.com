@@ -1,19 +1,23 @@
+# Python packages
 import json
-from pprint import pformat
-from urllib.parse import unquote
 
+# Exxternal packages
+from urllib.parse import unquote
 from flask import current_app as app
 
+# Local packages
 from heyWikiApp.text_to_speech.textToSpeech import GoogleTextToSpeech
 from heyWikiApp.parse_wikipedia_article import WikipediaParser
-from heyWikiApp.models import *
+from heyWikiApp.models import db, User, WikipediaArticles, AllWikiLinks
 
 
 def getUserDataFirst(currentUserUsername):
     return User.query.filter_by(username=currentUserUsername).first()
 
+
 def getUserRemainingLimit(currentUserUsername):
     return User.query.filter_by(username=currentUserUsername).first().remainingLimit
+
 
 def getUserDataAll(currentUserUsername):
     return User.query.filter_by(username=currentUserUsername).first()
@@ -39,7 +43,8 @@ def setUserRemainingLimit(currentUserUsername, lengthOfTextToConvert):
     user = getUserDataFirst(currentUserUsername)
     user.remainingLimit = user.remainingLimit - lengthOfTextToConvert
     db.session.commit()
-    
+
+
 def createNewWikipediaArticle(articleNameTosaveWith, articleDictToSave):
     newWikiArticle = WikipediaArticles(
         articleName=articleNameTosaveWith,
@@ -67,13 +72,6 @@ def createNewUser(username, email, password):
     db.session.commit()
 
 
-def removeWikiLinkFromUser(username, wikilinkToRemove):
-    user = getUserDataFirst('qwer')
-    uw = user.wikiLinks
-    user.wikiLinks = uw.replace(wikilinkToRemove, '')
-    # print (uw)
-    db.session.commit()
-
 
 class methodsForTTS():
     """Methods used for text-to-speech
@@ -95,6 +93,7 @@ class methodsForTTS():
         self.articleLanguage = articleLanguage
         self.wikipediaNetLoc = wikipediaNetLoc
 
+    @property
     def orchestrator(self):
         app.logger.info("Inside orchestrator")
         app.logger.info("self.currentUserUsername is %s " %
@@ -121,7 +120,8 @@ class methodsForTTS():
 
             app.logger.info("Article to convert is : %s " %
                             self.articleFragment)
-            return self.textToSpeech(self.articleFragment), self.articleFragment, self.articleContentsList, self.articleFragmentLength, self.articleTotalCharacterCount
+            return self.textToSpeech(
+                self.articleFragment), self.articleFragment, self.articleContentsList, self.articleFragmentLength, self.articleTotalCharacterCount
         app.logger.info("Article is there and its location is : %s" %
                         isArticleThere.location)
         return isArticleThere.location, self.articleFragment, self.articleContentsList, self.articleFragmentLength, self.articleTotalCharacterCount
@@ -166,8 +166,7 @@ class methodsForTTS():
                                  self.articleFragmentLength)
 
                 self.articleContentsList = [i for i in articleDict]
-                app.logger.info("article contents list is %s" %
-                                articleContentsList)
+
             wikiUrl = self.wikipediaNetLoc + self.wikipediaArticlePath
             app.logger.info("wikipedia url is : %s" % wikiUrl)
             parsedArticle = WikipediaParser(wikiUrl)
@@ -186,8 +185,6 @@ class methodsForTTS():
             self.articleFragment = ''.join(
                 articleDict[self.wikipediaArticleFragment][0])
             self.articleContentsList = [[contentName, articleDict[contentName][1]] for contentName in articleDict]
-            app.logger.info("article contents list is %s" %
-                            articleContentsList)
             self.articleFragmentLength = len(self.articleFragment)
             app.logger.debug("articleFragmentLength is %s" %
                              self.articleFragmentLength)
@@ -204,51 +201,20 @@ class methodsForTTS():
                 app.logger.info(
                     "articleLocation is for combined path : %s" % self.filename)
                 mediaLocation = GoogleTextToSpeech(
-                                                    textToConvert=convertThisArticleToSpeech,
-                                                    nameToSaveWith=self.filename,
-                                                    translateLanguage=self.articleLanguage,
-                                                    voiceGender='MALE',
-                                                    convertType='wiki'
-                                                    )
+                    textToConvert=convertThisArticleToSpeech,
+                    nameToSaveWith=self.filename,
+                    translateLanguage=self.articleLanguage,
+                    voiceGender='MALE',
+                    convertType='wiki'
+                )
                 createNewAllWikiLink(
-                                    self.nameToSaveWith,
-                                    mediaLocation,
-                                    convertThisArticleToSpeech
-                                    )
+                    self.nameToSaveWith,
+                    mediaLocation,
+                    convertThisArticleToSpeech
+                )
                 return mediaLocation
             media = getAllWikiLinksDataFirst(self.nameToSaveWith)
             return media.location
         except Exception as e:
             app.logger.error("error in get wiki : %s" % e)
             return str(e)
-
-
-###################
-##  Test TTS     ##
-###################
-
-""" If we parse the url then we get following result:
-
-https://en.wikipedia.org/wiki/Anarchy#Etymology
-ParseResult(scheme='https', netloc='en.wikipedia.org', path='/wiki/Anarchy',
-                        params='', query='', fragment='Etymology')
-                        
-https://en.wikipedia.org/wiki/Unincorporated_area
-https://en.wikipedia.org/wiki/Moore,_Indiana
-                       
-How to check if test passed ?
-check the article on wiki or in print console and the audio file created
-in $ (os.cpwd())/static/tts/                        
-"""
-
-
-def testTTS():
-    path = '/wiki/Unincorporated_area'
-    fragment = ''
-    user = 'qwer'
-    newtextToSpeech = methodsForTTS(user, path, fragment)
-    print(newtextToSpeech.nameToSaveWith)
-    art = newtextToSpeech.getWikipediaArticleFragment()
-    print(art)
-    newtextToSpeech.textToSpeech(art)
-    newtextToSpeech.addToUsersWikiLinks()

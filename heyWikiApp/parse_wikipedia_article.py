@@ -18,7 +18,7 @@ import bs4 as bs
 from flask import current_app as app
 
 
-class WikipediaParser():
+class WikipediaParser:
 
     def __init__(self, linkToWiki):
 
@@ -37,7 +37,6 @@ class WikipediaParser():
         self.ctr = 0
         self.wikiDict = {}
         self.articleTotalCharacterCount = 0
-
 
     def getContentTitles(self):
         """Get different sections Titles in the wikipedia article 
@@ -67,7 +66,8 @@ class WikipediaParser():
 
             Approach : Every wikipedia article has a contents pane and in html is id is 'toc'
                         So I grab that id's contents and all these contents are <li> tags with <span> which
-                        contains the text for content no and its name. So I take the name and put them in a wikiSectionTitles List.
+                        contains the text for content no and its name. So I take the name and put them in a
+                        wikiSectionTitles List.
 
 
         Returns:
@@ -117,7 +117,6 @@ class WikipediaParser():
         """
         app.logger.info("Inside getIntroParas")
         self.getAllContentTags()
-        ctr = 0
         for i in self.wikiParas[self.ctr:]:
             tag = i.name
             if tag != 'p':
@@ -126,9 +125,9 @@ class WikipediaParser():
                 self.articleTotalCharacterCount += articleCharacterCount
                 self.wikiDict[''] = [self.title + '. ' + joinedList, articleCharacterCount]
                 return ''.join(self.wikiIntro)
-            else:
-                self.wikiIntro.append(self.htmlToPlain(i))
-                self.ctr += 1
+
+            self.wikiIntro.append(self.htmlToPlain(i))
+            self.ctr += 1
 
     def parseParas(self):
         """Parse the paragraph(i.e content presented in <p> </p> tags)
@@ -143,7 +142,7 @@ class WikipediaParser():
             # print(tag)
             if tag in self.htags:
                 return l
-            elif tag == 'blockquote':
+            if tag == 'blockquote':
                 # print(self.htmlToPlain(i.p))
                 l.append("I quote what they said .:" + self.htmlToPlain(i.p) + ". Quote end.")
                 self.ctr += 1
@@ -232,8 +231,7 @@ class WikipediaParser():
                     joinedList = ''.join(l)
                     articleCharacterCount = len(joinedList)
                     self.articleTotalCharacterCount += articleCharacterCount
-                    self.wikiDict[currentTitle] = [(
-                            "%s. \n" % currentTitle + joinedList),articleCharacterCount]
+                    self.wikiDict[currentTitle] = [("%s. \n" % currentTitle + joinedList), articleCharacterCount]
                 ptr = self.ctr
         return self.wikiDict
 

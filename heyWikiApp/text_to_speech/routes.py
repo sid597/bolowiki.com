@@ -1,5 +1,5 @@
 # External packages
-from flask import  request, session, jsonify, Blueprint
+from flask import request, session, jsonify, Blueprint
 from urllib.parse import urlparse
 
 # Local packages
@@ -8,6 +8,7 @@ from .textToSpeech import GoogleTextToSpeech
 from ..utils import remainingCharacterLimitNotZero, login_required
 
 textToSpeech_bp = Blueprint('textToSpeech_bp', __name__, url_prefix='/text_to_speech')
+
 
 @textToSpeech_bp.route('/wikipedia/', methods=['GET', 'POST'])
 @remainingCharacterLimitNotZero
@@ -41,8 +42,8 @@ def getWiki():
 
         wikiLinkToBeParsed = str(request.form['wikipediaLink']).strip()
         articleLanguage = str(request.form['articleLanguage'])
-        # app.logger.info(
-            # "wikiLink to be parsed is : %s, artice language is %s, and its type is %s" % (wikiLinkToBeParsed, articleLanguage, type(wikiLinkToBeParsed)))
+        # app.logger.info( "wikiLink to be parsed is : %s, artice language is %s, and its type is %s" % (
+        # wikiLinkToBeParsed, articleLanguage, type(wikiLinkToBeParsed)))
         parsedUrl = urlparse(wikiLinkToBeParsed)
         # app.logger.info("parsedUrl is : %s" % str(parsedUrl))
         if parsedUrl.netloc not in acceptedWikipediaUrls or parsedUrl.scheme != 'https':
@@ -50,58 +51,61 @@ def getWiki():
             msg = "Pass a valid wikipedia url, for e.g :  https://en.wikipedia.org/wiki/Anarchy"
             return jsonify({
                 'txt': msg, 'mediaLocation':
-                '', "success": False,
+                    '', "success": False,
             })
-        else:
-            wikipediaNetLoc = getLanguageSpecificUrl[articleLanguage]
-            path = parsedUrl.path
-            fragment = parsedUrl.fragment
 
-            if 'logged_in' in session:
-                username = session['username']
-                newTTS = methodsForTTS(
-                    username,
-                    path,
-                    articleLanguage,
-                    wikipediaNetLoc,
-                    fragment
-                )
-                mediaLocation, articleFragment, articleContentsList, articleFragmentLength, articalTotalLength = newTTS.orchestrator()
-                # TODO : Uncomment the following line
-                # setUserRemainingLimit(username, articleFragmentLength)
+        wikipediaNetLoc = getLanguageSpecificUrl[articleLanguage]
+        path = parsedUrl.path
+        fragment = parsedUrl.fragment
 
-                return jsonify({
-                    'mediaLocation': mediaLocation + '.mp3',
-                    'txt': articleFragment,
-                    "success": True,
-                    'articleContents': articleContentsList,
-                    'articleFragmentLength': articleFragmentLength,
-                    'articalTotalLength': articalTotalLength, 
-                })
-            else:
-                username = 'UserNotLoggedIn'
-                fragment = ''
-                newTTS = methodsForTTS(
-                    username,
-                    path,
-                    articleLanguage,
-                    wikipediaNetLoc,
-                    fragment
-                )
-                mediaLocation, articleFragment, articleContentsList, articleFragmentLength, articalTotalLength = newTTS.orchestrator()
-                return jsonify({
-                    'mediaLocation': mediaLocation + '.mp3',
-                    'txt': articleFragment,
-                    "success": True,
-                    'articleContents': '',
-                    'articleFragmentLength': articleFragmentLength,
-                    'articalTotalLength': articalTotalLength
-                })
+        if 'logged_in' in session:
+            username = session['username']
+            newTTS = methodsForTTS(
+                username,
+                path,
+                articleLanguage,
+                wikipediaNetLoc,
+                fragment
+            )
+            mediaLocation, articleFragment, articleContentsList, articleFragmentLength, articalTotalLength = newTTS.orchestrator
+            # TODO : Uncomment the following line
+            # setUserRemainingLimit(username, articleFragmentLength)
+
+            return jsonify({
+                'mediaLocation': mediaLocation + '.mp3',
+                'txt': articleFragment,
+                "success": True,
+                'articleContents': articleContentsList,
+                'articleFragmentLength': articleFragmentLength,
+                'articalTotalLength': articalTotalLength,
+            })
+
+        username = 'UserNotLoggedIn'
+        fragment = ''
+        newTTS = methodsForTTS(
+            username,
+            path,
+            articleLanguage,
+            wikipediaNetLoc,
+            fragment
+        )
+        mediaLocation, articleFragment, articleContentsList, articleFragmentLength, articalTotalLength = newTTS.orchestrator
+        return jsonify({
+            'mediaLocation': mediaLocation + '.mp3',
+            'txt': articleFragment,
+            "success": True,
+            'articleContents': '',
+            'articleFragmentLength': articleFragmentLength,
+            'articalTotalLength': articalTotalLength
+        })
     except Exception as e:
         # app.logger.info("error in get wiki : %s" % e)
         return str(e)
-    
+
+
 textToSpeech_bp.route('/translated_text/', methods=["POST", "GET"])
+
+
 @login_required
 @remainingCharacterLimitNotZero
 def translateToSpeech():

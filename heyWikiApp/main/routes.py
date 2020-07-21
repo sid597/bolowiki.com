@@ -2,7 +2,7 @@
 from flask import session, redirect, render_template, url_for, Blueprint
 from ..utils import login_required
 
-main_bp = Blueprint('main_bp', __name__)
+main_bp = Blueprint('main_bp', __name__, template_folder='html_templates')
 
 
 @main_bp.route('/')
@@ -12,22 +12,19 @@ def homepage():
         if 'logged_in' in session:
             # app.logger.info("User is logged in")
             return redirect(url_for('main_bp.dashboard'))
-        else:
-            # app.logger.info("User is NOT logged in")
-            return render_template('layout/homepage.html')
+        return render_template('homepage.html')
     except Exception as e:
         return str(e)
-
 
 
 @main_bp.route('/dashboard/')
 @login_required
 def dashboard():
     # app.logger.info("Inside dashboard")
-    return render_template("/layout/dashboard.html")
+    return render_template("dashboard.html")
 
 
 @main_bp.errorhandler(404)
-def page_not_found(e):
+def page_not_found():
     # app.logger.info("Inside page_not_found")
-    return render_template('helper_templates/404.html')
+    return render_template('404.html')

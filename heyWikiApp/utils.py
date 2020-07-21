@@ -7,6 +7,7 @@ from flask import session, flash, redirect, url_for
 # Local Packages
 from .dbOperations import getUserRemainingLimit
 
+
 # Wrappers
 def login_required(f):
     @wraps(f)
@@ -16,7 +17,9 @@ def login_required(f):
         else:
             flash("You need to login first")
             return redirect(url_for('main_bp.main.login'))
+
     return wrap
+
 
 def remainingCharacterLimitNotZero(f):
     @wraps(f)
@@ -26,7 +29,9 @@ def remainingCharacterLimitNotZero(f):
             if remainingLimit > 0:
                 return f(*args, **kwargs)
         flash("Your limit for voice conversion is over contact siddharthdv77@gmail.com to upgrade.")
+
     return wrap
+
 
 def getRemainingLimit():
     username = session['username']

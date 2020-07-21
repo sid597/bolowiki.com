@@ -1,8 +1,5 @@
-# Python Packages
-import gc
-
 # External packages
-from flask import Flask, render_template, url_for, redirect, flash, request, session, jsonify, Blueprint
+from flask import request, session, jsonify, Blueprint
 
 # Imports from local packages
 from ..dbOperations import setUserRemainingLimit, GoogleTextToSpeech
@@ -10,6 +7,7 @@ from ..utils import login_required, remainingCharacterLimitNotZero
 from .utils import _translate
 
 translate_bp = Blueprint('translate_bp', __name__, url_prefix='/translate')
+
 
 @translate_bp.route('/toText/', methods=["POST", "GET"])
 @login_required
@@ -28,7 +26,7 @@ def translate():
         returnData = {'translatedTextResponse': translatedText,
                       'textWhichWasToBeTranslated': data['textToTranslate']}
         return jsonify(returnData)
-    except Exception as e:
+    except:
         return "noob"
         # print(e)
         # app.logger.error('Error in translate :%s' % e)

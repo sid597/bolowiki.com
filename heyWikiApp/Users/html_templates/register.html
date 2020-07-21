@@ -1,4 +1,4 @@
-{% extends "layout/index.html"  %}
+{% extends "index.html"  %}
 
 {% block body %}
 
@@ -6,7 +6,7 @@
 	<div class = "container">
 		<h4>Register</h4>
 		<br>
-		{% from "user_Management/_formhelpers.html" import render_field %}
+		{% from "_formhelpers.html" import render_field %}
 		<form method=post action="/register/">
 			<dl>
 				{{render_field(form.username)}}
