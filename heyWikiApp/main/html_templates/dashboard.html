@@ -1,0 +1,54 @@
+{%extends "index.html" %} 
+{%block body%}
+<div class="alert alert-secondary" role="alert">
+  <ul class="nav nav-pills" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <a
+        
+        class="nav-link"
+        id="search-tab"
+        data-toggle="tab"
+        href="#search"
+        role="tab"
+        aria-controls="search"
+        aria-selected="false"
+        >Search Wiki</a
+      >
+    </li>
+    <li class="nav-item" role="presentation">
+      <a
+        class="nav-link active"
+        id="translate-tab"
+        data-toggle="tab"
+        href="#translate"
+        role="tab"
+        aria-controls="translate"
+        aria-selected="true"
+        >Translate</a
+      >
+    </li>
+  </ul>
+</div>
+
+<!-- Tab Panes -->
+<div class="tab-content">
+  <div
+    class="tab-pane fade "
+    id="search"
+    role="tabpanel"
+    aria-labelledby="search-tab"
+  >
+    {%include"/search/main.html"%}
+  </div>
+
+  <div
+    class="tab-pane fade show active"
+    id="translate"
+    role="tabpanel"
+    aria-labelledby="translate-tab"
+  >
+  {%include"/translate/main.html"%}
+  </div>
+</div>
+
+{%endblock%}

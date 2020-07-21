@@ -1,0 +1,125 @@
+<!-- 
+  An experiment to visualise the input audio 
+ -->
+ 
+<div>
+    <audio controls  class="audioStream">
+        <source src="" type="audio/mpeg">
+    </audio>
+    <button id="but">Give permission</button>
+     <canvas id="canvas"></canvas>
+</div>
+
+
+
+<script>
+   const canvas = document.getElementById('canvas');
+document.addEventListener('DOMContentLoaded', () => {
+  const constraints = { audio: true };
+  async function getMedia(constraints) {
+       let stream = null;
+       try {
+         stream = await navigator.mediaDevices.getUserMedia(constraints);
+         console.debug(stream);
+         a = document.querySelector('.audioStream');
+         a.srcObject = stream;
+         a.onloadedmetadata = (e) => {
+           a.play();
+         };
+         getWaves(stream, canvas);
+       } catch (err) {
+         //   Do something
+         console.debug(err);
+       }
+     }
+     but = document.querySelector('#but');
+     but.addEventListener('click', () => {
+       getMedia(constraints);
+     });
+   });
+
+   function getWaves(stream, canvas) {
+     canvas.width = window.innerWidth;
+     canvas.height = window.innerHeight;
+   const canvasCtx = canvas.getContext('2d');
+     const AudioContext = window.AudioContext || window.webkitAudioContext;
+     const audioContext = new AudioContext();
+     const source = audioContext.createMediaStreamSource(stream);
+     const analyser = audioContext.createAnalyser();
+
+     source.connect(analyser);
+
+     /// //////////// ANALYSER FFTSIZE ////////////////////////
+     // analyser.fftSize = 32;
+     // analyser.fftSize = 64;
+     // analyser.fftSize = 128;
+     // analyser.fftSize = 256;
+     // analyser.fftSize = 512;
+     // analyser.fftSize = 1024;
+     // analyser.fftSize = 2048;
+     // analyser.fftSize = 4096;
+     // analyser.fftSize = 8192;
+     analyser.fftSize = 16384;
+     // analyser.fftSize = 32768;
+
+     const bufferLength = analyser.frequencyBinCount;
+     const dataArray = new Uint8Array(bufferLength);
+
+     const WIDTH = canvas.width;
+     const HEIGHT = canvas.height;
+     console.debug('WIDTH: ', WIDTH, 'HEIGHT: ', HEIGHT);
+
+     const barWidth = (WIDTH / bufferLength) * 2.5;
+     console.debug('BARWIDTH: ', barWidth);
+   
+     let barHeight;
+     let x = 0;
+
+     function renderFrame() {
+       requestAnimationFrame(renderFrame); // Takes callback function to invoke before rendering
+
+       x = 0;
+   
+       analyser.getByteFrequencyData(dataArray);
+
+       canvasCtx.fillStyle = 'rgba(0,0,0,0.2)';
+       canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+   
+       let r; let g; let
+         b;
+       const bars = 118;
+
+       for (let i = 0; i < bars; i++) {
+         barHeight = (dataArray[i] * 0.5);
+
+         if (dataArray[i] > 210) { // pink
+           r = 250;
+           g = 0;
+           b = 255;
+         } else if (dataArray[i] > 200) { // yellow
+           r = 66;
+           g = 133;
+           b = 244;
+         } else if (dataArray[i] > 190) { // yellow/green
+           r = 252;
+           g = 200;
+           b = 49;
+         } else if (dataArray[i] > 180) { // blue/green
+           r = 52;
+           g = 168;
+           b = 83;
+         } else { // light blue
+           r = 234;
+           g = 67;
+           b = 53;
+         }
+
+         canvasCtx.fillStyle = `rgb(${r},${g},${b})`;
+         canvasCtx.fillRect(x, (HEIGHT - barHeight), barWidth, barHeight);
+   
+         x += barWidth + 10;
+       }
+     }
+     renderFrame();
+   }
+</script>
