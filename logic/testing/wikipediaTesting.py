@@ -251,6 +251,7 @@ class WikipediaParser():
 
 
 def testThisUrl(url):
+    print(url)
     article = WikipediaParser(url)
     article.instantiate()
     purl = urlparse(url)
@@ -274,7 +275,7 @@ def testThisUrl(url):
 
 
 def testing():
-    urls = ["https://en.wikipedia.org/wiki/Anarchy#French_Revolution_(1789%E2%80%931799)"
+    urls = ["https://en.wikipedia.org/wiki/Anarchy#French_Revolution_(1789%E2%80%931799)",
             "https://en.wikipedia.org/wiki/Anarchy#Immanuel_Kant",
             "https://en.wikipedia.org/wiki/The_Devil%27s_Whore#Cast",
             "https://en.wikipedia.org/wiki/Wikipedia",
@@ -283,6 +284,7 @@ def testing():
             "https://hi.wikipedia.org/wiki/%E0%A4%B0%E0%A4%BE%E0%A4%AE%E0%A4%BE%E0%A4%AF%E0%A4%A3", 
             ]
     for url in urls:
+        print(url)
         testThisUrl(url)
 
 

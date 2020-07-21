@@ -3,13 +3,15 @@ import logging
 import os
 from functools import wraps
 from urllib.parse import urlparse
-
+from flask_migrate import Migrate
 from flask import Flask, render_template, url_for, redirect, flash, request, session, jsonify
 from passlib.hash import sha256_crypt
 from pymysql import escape_string as thwart
 from wtforms import Form, validators, PasswordField, TextField
 
-from logic.dbOperations import *
+from .logic.dbOperations import *
+from .translate.translator import _translate
+from pprint import pprint
 
 app = Flask(__name__, template_folder='templates')
 logging.basicConfig(filename='error.log', level=logging.DEBUG)
@@ -18,10 +20,11 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
 db.init_app(app)
-
-
+migrate = Migrate()
+migrate.init_app(app, db)
 # Add a user
 
+# Decorators 
 
 def login_required(f):
     @wraps(f)
@@ -35,6 +38,16 @@ def login_required(f):
 
     return wrap
 
+def remainingCharacterLimitNotZero(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            remainingLimit = getRemainingLimit()
+            if remainingLimit > 0:
+                return f(*args, **kwargs)
+        flash("Your limit for voice conversion is over contact siddharthdv77@gmail.com for upgrade.")
+    return wrap
+
 
 @app.route('/')
 def homepage():
@@ -42,10 +55,10 @@ def homepage():
         app.logger.info("Inside homepage")
         if 'logged_in' in session:
             app.logger.info("User is logged in")
-            # return redirect(url_for('dashboard'))
+            return redirect(url_for('dashboard'))
         else:
             app.logger.info("User is NOT logged in")
-        return render_template('layout/main.html')
+            return render_template('layout/homepage.html')
     except Exception as e:
         return str(e)
 
@@ -76,17 +89,21 @@ def login():
             app.logger.info("request  is %s" % request)
 
             app.logger.info("login request form is %s" % request.form)
-            data = User.query.filter_by(username="%s" % thwart(request.form['username'])).first()
+            app.logger.info('thwarted username is %s' %
+                            thwart(request.form['username']))
+            user = getUserDataFirst(thwart(request.form['username']))
+            app.logger.info('user info received from db is %s' % user)
+            UserPassword = user.password
 
-            passwd = data.password
-            app.logger.info(sha256_crypt.verify(request.form['password'], passwd))
+            app.logger.info(sha256_crypt.verify(
+                request.form['password'], UserPassword))
 
-            if sha256_crypt.verify(request.form['password'], passwd):
+            if sha256_crypt.verify(request.form['password'], UserPassword):
                 session['logged_in'] = True
                 session['username'] = request.form['username']
                 app.logger.info("You are now logged in")
                 flash("You are now logged in")
-                return redirect(url_for('homepage'))
+                return redirect(url_for('dashboard'))
             else:
                 app.logger.info("Invalid credentials ")
                 error = "Invalid credentials, try again."
@@ -137,10 +154,10 @@ def register_page():
             else:
 
                 createNewUser(
-                              username=thwart(username),
-                              email=thwart(email),
-                              password=password
-                              )
+                    username=thwart(username),
+                    email=thwart(email),
+                    password=password
+                )
 
                 flash("Thanks for registering!")
                 gc.collect()
@@ -154,10 +171,18 @@ def register_page():
     except Exception as e:
         return str(e)
 
+@app.route('/getRemainingLimit/', methods=['GET'])
+@login_required
+def getRemainingLimit():
+    username = session['username']
+    remainingLimit = getUserRemainingLimit(username)
+    return remainingLimit
+
 
 # app.logger.info("")
 @app.route('/converttospeech/', methods=['GET', 'POST'])
 # @login_required
+@remainingCharacterLimitNotZero
 def getWiki():
     """ Receive a request to convert the clicked link to audio
         check if link is present in AllWikiLinks
@@ -214,13 +239,16 @@ def getWiki():
                     fragment
                 )
                 mediaLocation, articleFragment, articleContentsList, articleFragmentLength, articalTotalLength = newTTS.orchestrator()
+                # TODO : Uncomment the following line
+                # setUserRemainingLimit(username, articleFragmentLength)
+
                 return jsonify({
                     'mediaLocation': mediaLocation + '.mp3',
                     'txt': articleFragment,
                     "success": True,
                     'articleContents': articleContentsList,
                     'articleFragmentLength': articleFragmentLength,
-                    'articalTotalLength': articalTotalLength
+                    'articalTotalLength': articalTotalLength, 
                 })
             else:
                 username = 'UserNotLoggedIn'
@@ -244,6 +272,50 @@ def getWiki():
     except Exception as e:
         app.logger.info("error in get wiki : %s" % e)
         return str(e)
+
+
+@app.route('/translate/', methods=["POST", "GET"])
+@login_required
+def translate():
+    try:
+        data = request.get_json()
+        srcLanguage = data['srcLanguage']
+        destLanguage = data['destLanguage']
+        textToTranlate = data['textToTranslate']
+        app.logger.info("Text to translate is : %s " % data)
+        translatedText = _translate(
+            textToTranlate,
+            src=srcLanguage,
+            dest=destLanguage)
+        app.logger.info("Translated Text is %s " % translatedText)
+        returnData = {'translatedTextResponse': translatedText,
+                      'textWhichWasToBeTranslated': data['textToTranslate']}
+        return jsonify(returnData)
+    except Exception as e:
+        return "noob"
+        # print(e)
+        app.logger.error('Error in translate :%s' % e)
+
+
+@app.route('/translateToSpeech/', methods=["POST", "GET"])
+@login_required
+@remainingCharacterLimitNotZero
+def translateToSpeech():
+    data = request.get_json()
+    app.logger.info("Request to translate text to speech with data %s" % data)
+    textToConvert = data['textToConvert']
+    nameToSaveWith = data['nameToSaveWith']
+    translateLanguage = data['translateLanguage']
+    voiceGender = data['voiceGender']
+    setUserRemainingLimit(session['username'], len(textToConvert))
+    mediaLocation = GoogleTextToSpeech(textToConvert=textToConvert,
+                                       nameToSaveWith=nameToSaveWith,
+                                       translateLanguage=translateLanguage,
+                                       voiceGender=voiceGender,
+                                       convertType='translate'
+                                       )
+    app.logger.info("Text to speech request audio file location is : %s" % mediaLocation)
+    return mediaLocation
 
 
 @app.route('/logout/')

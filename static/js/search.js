@@ -77,8 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   voiceSearchIcon.addEventListener('click', () => {
-    console.debug('Hello');
-
+    console.debug('voiceSearchIcon clicked');
     listenToVoiceQuery();
   });
 
@@ -96,7 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       // recognition.continuous = true;
       recognition.interimResults = true;
       recognition.lang = getVoiceSearchLanguage();
-      console.debug(recognition);
+      console.debug(`recognition data is ${recognition}`);
 
       recognition.onstart = (e) => {
         showVoiceSearchNormalMsg('Listening ...');

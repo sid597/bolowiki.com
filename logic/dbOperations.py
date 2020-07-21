@@ -4,14 +4,16 @@ from urllib.parse import unquote
 
 from flask import current_app as app
 
-from logic.tts import GoogleTextToSpeech
-from logic.wikipedia import WikipediaParser
-from models import *
+from .textToSpeech import GoogleTextToSpeech
+from .wikipedia import WikipediaParser
+from ..models import *
 
 
 def getUserDataFirst(currentUserUsername):
     return User.query.filter_by(username=currentUserUsername).first()
 
+def getUserRemainingLimit(currentUserUsername):
+    return User.query.filter_by(username=currentUserUsername).first().remainingLimit
 
 def getUserDataAll(currentUserUsername):
     return User.query.filter_by(username=currentUserUsername).first()
@@ -33,21 +35,26 @@ def getAllWikiLinksDataAll(linksNameTosearchWith=''):
     return AllWikiLinks.query.filter_by(wikiLink=linksNameTosearchWith).first()
 
 
+def setUserRemainingLimit(currentUserUsername, lengthOfTextToConvert):
+    user = getUserDataFirst(currentUserUsername)
+    user.remainingLimit = user.remainingLimit - lengthOfTextToConvert
+    db.session.commit()
+    
 def createNewWikipediaArticle(articleNameTosaveWith, articleDictToSave):
     newWikiArticle = WikipediaArticles(
-                                       articleName=articleNameTosaveWith,
-                                       articleDict=articleDictToSave
-                                       )
+        articleName=articleNameTosaveWith,
+        articleDict=articleDictToSave
+    )
     db.session.add(newWikiArticle)
     db.session.commit()
 
 
 def createNewAllWikiLink(articleNameTosaveWith, articleLocationToSaveWhere, textToSave):
     newWikiLinkWithFragment = AllWikiLinks(
-                                           wikiLink=articleNameTosaveWith,
-                                           location=articleLocationToSaveWhere,
-                                           text=textToSave
-                                           )
+        wikiLink=articleNameTosaveWith,
+        location=articleLocationToSaveWhere,
+        text=textToSave
+    )
     db.session.add(newWikiLinkWithFragment)
     db.session.commit()
 
@@ -197,9 +204,17 @@ class methodsForTTS():
                 app.logger.info(
                     "articleLocation is for combined path : %s" % self.filename)
                 mediaLocation = GoogleTextToSpeech(
-                    convertThisArticleToSpeech, self.filename, self.articleLanguage)
-                createNewAllWikiLink(self.nameToSaveWith,
-                                     mediaLocation, convertThisArticleToSpeech)
+                                                    textToConvert=convertThisArticleToSpeech,
+                                                    nameToSaveWith=self.filename,
+                                                    translateLanguage=self.articleLanguage,
+                                                    voiceGender='MALE',
+                                                    convertType='wiki'
+                                                    )
+                createNewAllWikiLink(
+                                    self.nameToSaveWith,
+                                    mediaLocation,
+                                    convertThisArticleToSpeech
+                                    )
                 return mediaLocation
             media = getAllWikiLinksDataFirst(self.nameToSaveWith)
             return media.location
@@ -231,9 +246,9 @@ def testTTS():
     path = '/wiki/Unincorporated_area'
     fragment = ''
     user = 'qwer'
-    newtts = methodsForTTS(user, path, fragment)
-    print(newtts.nameToSaveWith)
-    art = newtts.getWikipediaArticleFragment()
+    newtextToSpeech = methodsForTTS(user, path, fragment)
+    print(newtextToSpeech.nameToSaveWith)
+    art = newtextToSpeech.getWikipediaArticleFragment()
     print(art)
-    newtts.textToSpeech(art)
-    newtts.addToUsersWikiLinks()
+    newtextToSpeech.textToSpeech(art)
+    newtextToSpeech.addToUsersWikiLinks()

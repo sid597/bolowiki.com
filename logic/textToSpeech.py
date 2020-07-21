@@ -1,24 +1,38 @@
 import os
-
 from flask import current_app as app
 from google.cloud import texttospeech
 
 
-def GoogleTextToSpeech(textToConvert, nameToSaveWith, translateLanguage):
+def GoogleTextToSpeech(textToConvert, nameToSaveWith, translateLanguage, voiceGender, convertType):
+    ssmlVoiceGender = {
+        'MALE': texttospeech.SsmlVoiceGender.MALE,
+        'FEMALE': texttospeech.SsmlVoiceGender.FEMALE
+    }
+    ssmlVoiceGender[voiceGender]
     languageSettings = {'hi':
                         {
                             'language_code': 'hi-IN',
-                            'ssml_gender': texttospeech.SsmlVoiceGender.MALE,
+                            'ssml_gender': ssmlVoiceGender[voiceGender],
                             'speaking_rate': 0.85
-
                         },
 
                         'en': {
                             'language_code': 'en-US',
-                            'ssml_gender': texttospeech.SsmlVoiceGender.MALE,
+                            'ssml_gender': ssmlVoiceGender[voiceGender],
                             'speaking_rate': 1
-
-                        }, }
+                        },
+                        'en-IN': {
+                            'language_code': 'en-IN',
+                            'ssml_gender': ssmlVoiceGender[voiceGender],
+                            'speaking_rate': 1
+                        },
+                        'en-GB': {
+                            'language_code': 'en-GB',
+                            'name' : "en-GB-Wavenet-D",
+                            'ssml_gender': ssmlVoiceGender[voiceGender],
+                            'speaking_rate': 1
+                        },
+                        }
     app.logger.info("Inside GoogleTextToSpeech")
     # print(textToConvert)
     app.logger.info(
@@ -48,8 +62,11 @@ def GoogleTextToSpeech(textToConvert, nameToSaveWith, translateLanguage):
     response = client.synthesize_speech(
         input=synthesis_input, voice=voice, audio_config=audio_config
     )
-
-    saveDirectory = os.getcwd() + "/static/tts/"
+    if convertType == 'wiki':
+        saveDirectory = os.getcwd() + "/static/textToSpeech/"
+    else:
+        # TODO: change the location
+        saveDirectory = os.getcwd() + "/static/translate/"
     mediaLocation = saveDirectory + nameToSaveWith + ".mp3"
     app.logger.info("mediaLocation is going to be : %s " % mediaLocation)
     # The response's audio_content is binary.
@@ -57,10 +74,10 @@ def GoogleTextToSpeech(textToConvert, nameToSaveWith, translateLanguage):
         # Write the response to the output file.
         out.write(response.audio_content)
         # print('Audio content written to file "output.mp3"')
-    return "../static/tts/" + nameToSaveWith
+    return "../static/textToSpeech/" + nameToSaveWith
 
 
-# Test this by $ python3 tts.py
+# Test this by $ python3 textToSpeech.py
 # You should see a file helloworld.mp3 in you static directory
 
 if __name__ == '__main__':
