@@ -103,24 +103,3 @@ def getWiki():
         return str(e)
 
 
-textToSpeech_bp.route('/translated_text/', methods=["POST", "GET"])
-
-
-@login_required
-@remainingCharacterLimitNotZero
-def translateToSpeech():
-    data = request.get_json()
-    # app.logger.info("Request to translate text to speech with data %s" % data)
-    textToConvert = data['textToConvert']
-    nameToSaveWith = data['nameToSaveWith']
-    translateLanguage = data['translateLanguage']
-    voiceGender = data['voiceGender']
-    setUserRemainingLimit(session['username'], len(textToConvert))
-    mediaLocation = GoogleTextToSpeech(textToConvert=textToConvert,
-                                       nameToSaveWith=nameToSaveWith,
-                                       translateLanguage=translateLanguage,
-                                       voiceGender=voiceGender,
-                                       convertType='translate'
-                                       )
-    # app.logger.info("Text to speech request audio file location is : %s" % mediaLocation)
-    return mediaLocation

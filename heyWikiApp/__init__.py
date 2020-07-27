@@ -1,14 +1,15 @@
 # Python packages
 import logging
+from pprint import pprint
 
 # External Packages
 from flask_migrate import Migrate
 from flask import Flask
-from heyWikiApp.config import Config
 
 # Local Packages
 from heyWikiApp.models import db
-from pprint import pprint
+from heyWikiApp.config import Config
+
 
 logging.basicConfig(filename='error.log', level=logging.DEBUG)
 migrate = Migrate()
