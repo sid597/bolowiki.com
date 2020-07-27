@@ -23,7 +23,7 @@ def create_app(config_class=Config):
 
     from heyWikiApp.Users.routes import users_bp
     from heyWikiApp.main.routes import main_bp
-    from heyWikiApp.text_to_speech.routes import textToSpeech_bp
+    from heyWikiApp.wikipedia_text_to_speech.routes import textToSpeech_bp
     from heyWikiApp.Translate.routes import translate_bp
     app.register_blueprint(main_bp)
     app.register_blueprint(translate_bp)

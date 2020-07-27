@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const textToTranslateData = translatedCardBody.innerHTML;
     const request = new XMLHttpRequest();
     console.log('translateTextToSpeech clicked');
-    request.open('POST', '/text_to_speech/translated_text/');
+    request.open('POST', '/translate/toSpeech/');
     request.onload = () => { };
     const postData = JSON.stringify({
       textToConvert: textToTranslateData,

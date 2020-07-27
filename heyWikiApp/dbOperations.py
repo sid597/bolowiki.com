@@ -6,7 +6,7 @@ from urllib.parse import unquote
 from flask import current_app as app
 
 # Local packages
-from heyWikiApp.text_to_speech.textToSpeech import GoogleTextToSpeech
+from heyWikiApp.wikipedia_text_to_speech.textToSpeech import GoogleTextToSpeech
 from heyWikiApp.parse_wikipedia_article import WikipediaParser
 from heyWikiApp.models import db, User, WikipediaArticles, AllWikiLinks
 

@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.debug('inside getAudioFileData');
     console.debug(`function to handle response is ${functionToHandleTheResponse}`);
     const request = new XMLHttpRequest();
-    request.open('POST', '/converttospeech/');
+    request.open('POST', '/text_to_speech/wikipedia/');
     request.onload = () => {
       hideSpinner();
       console.debug(`request response text is ${request.responseText}`);
