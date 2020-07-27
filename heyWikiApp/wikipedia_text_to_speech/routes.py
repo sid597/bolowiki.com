@@ -1,6 +1,7 @@
 # External packages
 from flask import request, session, jsonify, Blueprint
 from urllib.parse import urlparse
+from flask import current_app as app
 
 # Local packages
 from ..dbOperations import methodsForTTS, setUserRemainingLimit
@@ -11,7 +12,6 @@ textToSpeech_bp = Blueprint('textToSpeech_bp', __name__, url_prefix='/text_to_sp
 
 
 @textToSpeech_bp.route('/wikipedia/', methods=['GET', 'POST'])
-@remainingCharacterLimitNotZero
 def getWiki():
     """ Receive a request to convert the clicked link to audio
         check if link is present in AllWikiLinks
