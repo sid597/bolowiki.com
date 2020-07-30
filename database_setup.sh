@@ -21,6 +21,6 @@ execAsRoot "grant all privileges on $database.* to '$user'@'localhost';"
 execAsRoot "flush privileges;"
 
 source venv/bin/activate
-export FLASK_APP=heyWikiApp/__init__.py
+export FLASK_APP=bolowikiApp/__init__.py
 export FLASK_ENV=development      
 flask db upgrade

@@ -6,9 +6,9 @@ from urllib.parse import unquote
 from flask import current_app as app
 
 # Local packages
-from heyWikiApp.wikipedia_text_to_speech.textToSpeech import GoogleTextToSpeech
-from heyWikiApp.parse_wikipedia_article import WikipediaParser
-from heyWikiApp.models import db, User, WikipediaArticles, AllWikiLinks
+from bolowikiApp.wikipedia_text_to_speech.textToSpeech import GoogleTextToSpeech
+from bolowikiApp.parse_wikipedia_article import WikipediaParser
+from bolowikiApp.models import db, User, WikipediaArticles, AllWikiLinks
 
 
 def getUserDataFirst(currentUserUsername):

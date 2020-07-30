@@ -1,4 +1,4 @@
-from heyWikiApp import create_app
+from bolowikiApp import create_app
 import os
 
 app = create_app()

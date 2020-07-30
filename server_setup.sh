@@ -42,8 +42,8 @@ $ sudo apt-get -y install mysql-server postfix supervisor nginx git
 
 # Install the application 
 
-git clone git@github.com:sid597/heyWiki.git
-cd heyWiki
+git clone git@github.com:sid597/bolowiki.git
+cd bolowiki
 python3 -m venv venv
 source venv/bin/activate
 pip install wheel
