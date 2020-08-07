@@ -85,7 +85,7 @@ class methodsForTTS():
             '_'.join(path.split('/')) + '_' + articleLanguage+ '_'  +'#' + self.wikipediaArticleFragment)
         self.nameWithoutFragment = str('_'.join(path.split('/')) + '_' + articleLanguage+ '_' )
         self.filename = unquote(
-            '_'.join(path.split('/')) + '__' + self.wikipediaArticleFragment)
+            '_'.join(path.split('/')) + '_' + articleLanguage+ '_' + self.wikipediaArticleFragment)
         self.articleFragment = None
         self.articleContentsList = None
         self.articleTotalCharacterCount = 0
