@@ -33,7 +33,7 @@ def login():
 
     except:
         # flash(e)
-        # app.logger.error("Error occured ----> %s" % e)
+         app.logger.error("Error occured ----> %s" % e)
         error = "Invalid credentials, try again."
         return render_template("login.html", error=error)
 

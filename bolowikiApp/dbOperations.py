@@ -111,7 +111,7 @@ class methodsForTTS():
         self.getWikipediaArticleFragment()
         if self.nameToSaveWith in userWikiLinks:
             # TODO somehow tell the user to move to that location
-            # app.logger.info("Article data %s" %(isArticleThere.location, self.articleFragment, articleContentsList))
+             app.logger.info("Article data %s" %(isArticleThere.location, self.articleFragment, articleContentsList))
             return isArticleThere.location, self.articleFragment, self.articleContentsList, self.articleFragmentLength, self.articleTotalCharacterCount
 
         self.addToUsersWikiLinks()
@@ -153,7 +153,7 @@ class methodsForTTS():
             article = getWikipediaArticleDataFirst(self.nameWithoutFragment)
             app.logger.info("article is : %s" % article)
             if article is not None:
-                # app.logger.info(pformat("article is : %s" % article.articleDict))
+                 app.logger.info(pformat("article is : %s" % article.articleDict))
                 articleDict = json.loads(article.articleDict)
                 # pprint(articleDict)
                 self.articleFragment = ''.join(
@@ -180,7 +180,7 @@ class methodsForTTS():
             createNewWikipediaArticle(
                 self.nameWithoutFragment, jsonifiedArticle)
             app.logger.info("Commit successful")
-            # app.logger.info("Checking if article got commited :  %s" % (
+             app.logger.info("Checking if article got commited :  %s" % (
             #     getWikipediaArticleDataFirst(self.nameWithoutFragment)).articleDict)
             self.articleFragment = ''.join(
                 articleDict[self.wikipediaArticleFragment][0])

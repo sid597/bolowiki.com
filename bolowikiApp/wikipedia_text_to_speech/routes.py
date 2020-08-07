@@ -36,16 +36,16 @@ def getWiki():
             'en': 'https://en.wikipedia.org',
             'hi': 'https://hi.wikipedia.org'
         }
-        # app.logger.info("Inside getWiki")
-        # app.logger.info("request received is %s" % request)
-        # app.logger.info("request form received is %s" % request.form)
+         app.logger.info("Inside getWiki")
+         app.logger.info("request received is %s" % request)
+         app.logger.info("request form received is %s" % request.form)
 
         wikiLinkToBeParsed = str(request.form['wikipediaLink']).strip()
         articleLanguage = str(request.form['articleLanguage'])
-        # app.logger.info( "wikiLink to be parsed is : %s, artice language is %s, and its type is %s" % (
+         app.logger.info( "wikiLink to be parsed is : %s, artice language is %s, and its type is %s" % (
         # wikiLinkToBeParsed, articleLanguage, type(wikiLinkToBeParsed)))
         parsedUrl = urlparse(wikiLinkToBeParsed)
-        # app.logger.info("parsedUrl is : %s" % str(parsedUrl))
+         app.logger.info("parsedUrl is : %s" % str(parsedUrl))
         if parsedUrl.netloc not in acceptedWikipediaUrls or parsedUrl.scheme != 'https':
 
             msg = "Pass a valid wikipedia url, for e.g :  https://en.wikipedia.org/wiki/Anarchy"
@@ -99,7 +99,7 @@ def getWiki():
             'articalTotalLength': articalTotalLength
         })
     except Exception as e:
-        # app.logger.info("error in get wiki : %s" % e)
+         app.logger.info("error in get wiki : %s" % e)
         return str(e)
 
 
