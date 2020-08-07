@@ -63,10 +63,10 @@ def GoogleTextToSpeech(textToConvert, nameToSaveWith, translateLanguage, voiceGe
         input=synthesis_input, voice=voice, audio_config=audio_config
     )
     if convertType == 'wiki':
-        saveDirectory = os.getcwd() + "/static/textToSpeech/"
+        saveDirectory = os.getcwd() + "/bolowikiApp/static/textToSpeech/"
     else:
         # TODO: change the location
-        saveDirectory = os.getcwd() + "/static/translate/"
+        saveDirectory = os.getcwd() + "/bolowikiApp/static/translate/"
     mediaLocation = saveDirectory + nameToSaveWith + ".mp3"
     app.logger.info("mediaLocation is going to be : %s " % mediaLocation)
     # The response's audio_content is binary.

@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const textToTranslateData = textToTranslate.textContent;
     characterCount.innerHTML = textToTranslateData.length;
     const request = new XMLHttpRequest();
-    request.open('POST', '/translate/toText');
+    request.open('POST', '/translate/toText/');
     request.onload = () => {
       const responseData = JSON.parse(request.responseText);
       translatedCardBody.innerHTML = responseData.translatedTextResponse;
