@@ -5,7 +5,7 @@ from pprint import pprint
 # External Packages
 from flask_migrate import Migrate
 from flask import Flask
-from flask import current_app as app
+# from flask import current_app as app
 
 # Local Packages
 from bolowikiApp.models import db
@@ -38,7 +38,7 @@ this_app = create_app()
 
 if __name__ != '__main__':
     gunicorn_logger = logging.getLogger('gunicorn.error')
-    app.logger.handlers = gunicorn_logger.handlers
-    app.logger.setLevel(gunicorn_logger.level)
+    this_app.logger.handlers = gunicorn_logger.handlers
+    this_app.logger.setLevel(gunicorn_logger.level)
 if __name__ == '__main__':
     this_app.run(debug=True)
