@@ -99,7 +99,7 @@ def getWiki():
             'articalTotalLength': articalTotalLength
         })
     except Exception as e:
-        app.logger.info("error in get wiki : %s" % e)
+        app.logger.info("error in get wiki route : %s" % e)
         return str(e)
 
 

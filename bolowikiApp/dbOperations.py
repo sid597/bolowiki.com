@@ -189,7 +189,7 @@ class methodsForTTS():
                              self.articleFragmentLength)
 
         except Exception as e:
-            app.logger.error("error in get wiki : %s" % e)
+            app.logger.error("error in get wiki article fragment : %s" % e)
             return str(e)
 
     def textToSpeech(self, convertThisArticleToSpeech):
@@ -215,5 +215,5 @@ class methodsForTTS():
             media = getAllWikiLinksDataFirst(self.nameToSaveWith)
             return media.location
         except Exception as e:
-            app.logger.error("error in get wiki : %s" % e)
+            app.logger.error("error in get wiki text to speech : %s" % e)
             return str(e)
