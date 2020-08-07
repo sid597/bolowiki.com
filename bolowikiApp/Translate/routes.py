@@ -1,4 +1,5 @@
 # External packages
+from flask import current_app as app
 from flask import request, session, jsonify, Blueprint
 
 # Imports from local packages
@@ -17,19 +18,19 @@ def translate():
         srcLanguage = data['srcLanguage']
         destLanguage = data['destLanguage']
         textToTranlate = data['textToTranslate']
-         app.logger.info("Text to translate is : %s " % data)
+        app.logger.info("Text to translate is : %s " % data)
         translatedText = _translate(
             textToTranlate,
             src=srcLanguage,
             dest=destLanguage)
-         app.logger.info("Translated Text is %s " % translatedText)
+        app.logger.info("Translated Text is %s " % translatedText)
         returnData = {'translatedTextResponse': translatedText,
                       'textWhichWasToBeTranslated': data['textToTranslate']}
         return jsonify(returnData)
     except:
         return "noob"
         # print(e)
-         app.logger.error('Error in translate :%s' % e)
+        app.logger.error('Error in translate :%s' % Exception)
 
 
 @translate_bp.route('/toSpeech/', methods=["POST", "GET"])
@@ -37,7 +38,7 @@ def translate():
 @remainingCharacterLimitNotZero
 def translateToSpeech():
     data = request.get_json()
-     app.logger.info("Request to translate text to speech with data %s" % data)
+    app.logger.info("Request to translate text to speech with data %s" % data)
     textToConvert = data['textToConvert']
     nameToSaveWith = data['nameToSaveWith']
     translateLanguage = data['translateLanguage']
@@ -49,5 +50,5 @@ def translateToSpeech():
                                        voiceGender=voiceGender,
                                        convertType='translate'
                                        )
-     app.logger.info("Text to speech request audio file location is : %s" % mediaLocation)
+    app.logger.info("Text to speech request audio file location is : %s" % mediaLocation)
     return mediaLocation

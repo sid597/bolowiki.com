@@ -5,6 +5,7 @@ from pprint import pprint
 # External Packages
 from flask_migrate import Migrate
 from flask import Flask
+from flask import current_app as app
 
 # Local Packages
 from bolowikiApp.models import db
