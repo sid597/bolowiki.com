@@ -2,10 +2,12 @@
 import gc
 
 # External packages
+from flask import current_app as app
 from flask import render_template, url_for, redirect, flash, request, session, Blueprint
 from passlib.hash import sha256_crypt
 from pymysql import escape_string as thwart
 from wtforms import Form, validators, PasswordField, TextField
+
 
 # Local packages
 from ..dbOperations import getUserDataFirst, createNewUser
@@ -33,7 +35,7 @@ def login():
 
     except:
         # flash(e)
-         app.logger.error("Error occured ----> %s" % e)
+        app.logger.error("Error occured ----> %s" % Exception)
         error = "Invalid credentials, try again."
         return render_template("login.html", error=error)
 
