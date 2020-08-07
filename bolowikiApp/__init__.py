@@ -13,10 +13,6 @@ from bolowikiApp.config import Config
 
 migrate = Migrate()
 
-if __name__ != '__main__':
-    gunicorn_logger = logging.getLogger('gunicorn.error')
-    app.logger.handlers = gunicorn_logger.handlers
-    app.logger.setLevel(gunicorn_logger.level)
 
 def create_app(config_class=Config):
     app = Flask(__name__, template_folder='templates')
@@ -38,5 +34,10 @@ def create_app(config_class=Config):
 
 
 this_app = create_app()
+
+if __name__ != '__main__':
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
 if __name__ == '__main__':
     this_app.run(debug=True)
