@@ -15,5 +15,5 @@
     "terminal.integrated.fontWeight": "500",
     "terminal.integrated.fontWeightBold": "normal",
     "oneDarkPro.bold": true,
-    "python.pythonPath": "/home/sid597/Don-tReadListen/venv/bin/python3"
+    "python.pythonPath": "/usr/bin/python3"
 }
