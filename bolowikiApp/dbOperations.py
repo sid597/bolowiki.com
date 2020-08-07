@@ -82,8 +82,8 @@ class methodsForTTS():
         self.wikipediaArticlePath = path
         self.wikipediaArticleFragment = ' '.join(unquote(fragment).split('_'))
         self.nameToSaveWith = unquote(
-            '_'.join(path.split('/')) + '#' + self.wikipediaArticleFragment)
-        self.nameWithoutFragment = str('_'.join(path.split('/')))
+            '_'.join(path.split('/')) + '_' + articleLanguage+ '_'  +'#' + self.wikipediaArticleFragment)
+        self.nameWithoutFragment = str('_'.join(path.split('/')) + '_' + articleLanguage+ '_' )
         self.filename = unquote(
             '_'.join(path.split('/')) + '__' + self.wikipediaArticleFragment)
         self.articleFragment = None
