@@ -49,7 +49,7 @@ class RegistrationForm(Form):
                            message='Passwords must match'
                            )
     ])
-    confirm = PasswordField('Repeat Password')
+    confirm = PasswordField('Confirm Password')
 
 
 @users_bp.route('/register/', methods=["GET", "POST"])
