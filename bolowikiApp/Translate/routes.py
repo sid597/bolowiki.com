@@ -42,7 +42,7 @@ def translateToSpeech():
     textToConvert = data['textToConvert']
     nameToSaveWith = data['nameToSaveWith']
     translateLanguage = data['translateLanguage']
-    voiceGender = data['voiceGender']
+    voiceGender = data['voiceGender'].strip().upper()
     setUserRemainingLimit(session['username'], len(textToConvert))
     mediaLocation = GoogleTextToSpeech(textToConvert=textToConvert,
                                        nameToSaveWith=nameToSaveWith,

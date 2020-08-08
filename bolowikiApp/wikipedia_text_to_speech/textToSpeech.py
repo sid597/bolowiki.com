@@ -8,7 +8,7 @@ def GoogleTextToSpeech(textToConvert, nameToSaveWith, translateLanguage, voiceGe
         'MALE': texttospeech.SsmlVoiceGender.MALE,
         'FEMALE': texttospeech.SsmlVoiceGender.FEMALE
     }
-
+    print('translateLanguage is : %s' % translateLanguage)
     languageSettings = {'hi':
                         {
                             'language_code': 'hi-IN',

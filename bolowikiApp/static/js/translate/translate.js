@@ -107,6 +107,15 @@ const LANGUAGES = {
   yo: 'yoruba',
   zu: 'zulu',
 };
+
+const speechToText = {
+  'en-UK': 'en',
+  'en-IN': 'en',
+  'en-US': 'en',
+  hi: 'hi',
+}
+
+
 document.addEventListener('DOMContentLoaded', () => {
   const textareaElement = document.querySelector('.textareaElement');
   const textToTranslate = document.querySelector('#textToTranslate');
@@ -119,6 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const voiceSelectDropdownButton = document.querySelector('#voiceSelectDropdownButton');
   const translateLanguageFromDropdownButton = document.querySelector('#translateLanguageFromDropdownButton');
   const translateLanguageToDropdownButton = document.querySelector('#translateLanguageToDropdownButton');
+  let convertSpeechToLanguage = 'hi';
 
   const nameToSaveWith = document.querySelector('#nameToSaveWith');
   const characterCount = document.querySelector('#characterCount');
@@ -129,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // #############################################################################
 
   // Language translate from dropdown
-  translateLanguageFromDropdownButton.textContent = 'Auto Detect  ';
+  translateLanguageFromDropdownButton.textContent = 'Hindi  ';
   document.querySelector('#translateLanguageFromList').addEventListener('click', (e) => {
     console.log(e.target.textContent);
     translateLanguageFromDropdownButton.textContent = `${e.target.textContent}  `;
@@ -139,6 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelector('#translateLanguageToList').addEventListener('click', (e) => {
     console.log(e.target.textContent);
     translateLanguageToDropdownButton.textContent = `${e.target.textContent}  `;
+    convertSpeechToLanguage = e.target.id;
   });
   // Voice gender dropdown
   voiceSelectDropdownButton.textContent = 'Male  ';
@@ -172,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
       textToTranslate: textToTranslateData,
       srcLanguage: 'en',
       // destLanguage: 'en',
-      destLanguage: 'hi',
+      destLanguage: speechToText[convertSpeechToLanguage],
     });
     console.log(`Data to send for speech translation is ${postData}`);
     request.setRequestHeader('Content-type', 'application/json');
@@ -180,16 +191,18 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Translate text to speech
-  
+
   translateTextToSpeech.addEventListener('click', () => {
     const textToTranslateData = translatedCardBody.innerHTML;
     const request = new XMLHttpRequest();
     console.log('translateTextToSpeech clicked');
     request.open('POST', '/translate/toSpeech/');
-    request.onload = () => { };
+    request.onload = () => {
+
+    };
     const postData = JSON.stringify({
       textToConvert: textToTranslateData,
-      translateLanguage: 'en-GB',
+      translateLanguage: convertSpeechToLanguage,
       nameToSaveWith: nameToSaveWith.value.length !== 0 ? nameToSaveWith.value : 'sid_translate',
       voiceGender: voiceSelectDropdownButton.textContent,
     });
