@@ -9,14 +9,14 @@ def GoogleTextToSpeech(textToConvert, nameToSaveWith, translateLanguage, voiceGe
         'FEMALE': texttospeech.SsmlVoiceGender.FEMALE
     }
     print('translateLanguage is : %s' % translateLanguage)
-    languageSettings = {'hi':
+    languageSettings = {'hi-IN':
                         {
                             'language_code': 'hi-IN',
                             'ssml_gender': ssmlVoiceGender[voiceGender],
-                            'speaking_rate': 0.85
+                            'speaking_rate': 0.7
                         },
 
-                        'en': {
+                        'en-US': {
                             'language_code': 'en-US',
                             'ssml_gender': ssmlVoiceGender[voiceGender],
                             'speaking_rate': 1
@@ -64,15 +64,24 @@ def GoogleTextToSpeech(textToConvert, nameToSaveWith, translateLanguage, voiceGe
     )
     if convertType == 'wiki':
         saveDirectory = os.getcwd() + "/bolowikiApp/static/textToSpeech/"
+        mediaLocation = saveDirectory + nameToSaveWith + ".mp3"
+        app.logger.info("mediaLocation is going to be : %s " % mediaLocation)
+        # The response's audio_content is binary.
+        with open(mediaLocation, "wb") as out:
+            # Write the response to the output file.
+            out.write(response.audio_content)
+            # print('Audio content written to file "output.mp3"')
+        return "../static/textToSpeech/" + nameToSaveWith + ".mp3"
     else:
         # TODO: change the location
         saveDirectory = os.getcwd() + "/bolowikiApp/static/translate/"
-    mediaLocation = saveDirectory + nameToSaveWith + ".mp3"
-    app.logger.info("mediaLocation is going to be : %s " % mediaLocation)
-    # The response's audio_content is binary.
-    with open(mediaLocation, "wb") as out:
-        # Write the response to the output file.
-        out.write(response.audio_content)
-        # print('Audio content written to file "output.mp3"')
-    return "../static/textToSpeech/" + nameToSaveWith
+        mediaLocation = saveDirectory + nameToSaveWith + ".mp3"
+        app.logger.info("mediaLocation is going to be : %s " % mediaLocation)
+        # The response's audio_content is binary.
+        with open(mediaLocation, "wb") as out:
+            # Write the response to the output file.
+            out.write(response.audio_content)
+            # print('Audio content written to file "output.mp3"')
+        return "../static/translate/" + nameToSaveWith + ".mp3"
+    
 
