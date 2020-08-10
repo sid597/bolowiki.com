@@ -23,6 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const voiceSelectDropdownButton = document.querySelector('#voiceSelectDropdownButton');
   const translateLanguageFromDropdownButton = document.querySelector('#translateLanguageFromDropdownButton');
   const translateLanguageToDropdownButton = document.querySelector('#translateLanguageToDropdownButton');
+  let translatedVoiceFiles = document.querySelector('#translatedVoiceFiles');
+
   let fromLanguage = 'en-US';
   let toLanguage = 'hi-IN';
 
@@ -63,7 +65,9 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('translateTextToSpeech clicked');
     request.open('POST', '/translate/toSpeech/');
     request.onload = () => {
-
+      const responseData = request.responseText;
+      console.log(responseData);
+      translatedVoiceFiles.innerHTML = `<audio id="audioControl" controls style="width: 100%;"><source src="${responseData}" type="audio/mpeg" />Your browser does not support the audio element.</audio>`;
     };
     const postData = JSON.stringify({
       textToConvert: textToTranslateData,
@@ -101,6 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelector('#demolist').addEventListener('click', (e) => {
     console.log(e.target.textContent);
     voiceSelectDropdownButton.textContent = `${e.target.textContent}  `;
+    requestToSpeechTranslate();
   });
 
   // Paste text as plain text in content editable
