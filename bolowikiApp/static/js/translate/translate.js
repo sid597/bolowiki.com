@@ -130,12 +130,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // ## Voice Input related Functions                                          ##
   // #############################################################################
 
-  function showmicIconError(msg) {
+  function showVoiceInputError(msg) {
     micIconCurrentStatus.className = 'alert alert-danger';
     micIconCurrentStatus.innerHTML = msg;
   }
 
-  function showmicIconNormalMsg(msg) {
+  function showVoiceInputNormalMsg(msg) {
     micIconCurrentStatus.className = 'alert alert-light';
     micIconCurrentStatus.innerHTML = msg;
   }
@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
       console.debug(`recognition data is ${recognition}`);
 
       recognition.onstart = (e) => {
-        showmicIconNormalMsg('Listening ...');
+        showVoiceInputNormalMsg('Listening ...');
         console.debug(`recognition started ${e}`);
       };
 
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const trans = e.results[0][0].transcript;
 
         console.debug(`recognition complete here is your result ${trans}`);
-        showmicIconNormalMsg(trans);
+        showVoiceInputNormalMsg(trans);
         console.log(`textToTranslate.innerHTML is : ${textToTranslate.innerHTML}`);
         textToTranslate.innerHTML = trans;
         requestToTextTranslate();
@@ -182,13 +182,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
       recognition.onerror = (e) => {
         if (e.error === 'no-speech') {
-          showmicIconError('No speech was detected. You may need to adjust your  microphone');
+          showVoiceInputError('No speech was detected. You may need to adjust your  microphone');
         }
         if (e.error === 'audio-capture') {
-          showmicIconError('No microphone was found. Ensure that a microphone is installed and that microphone settings</a> are configured correctly.');
+          showVoiceInputError('No microphone was found. Ensure that a microphone is installed and that microphone settings</a> are configured correctly.');
         }
         if (e.error === 'not-allowed') {
-          showmicIconError('Permission to use microphone was denied/blocked. To change,go to chrome://settings/contentExceptions#media-stream');
+          showVoiceInputError('Permission to use microphone was denied/blocked. To change,go to chrome://settings/contentExceptions#media-stream');
         }
 
         console.debug(` error occured : ${e.error}`);
@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
       recognition.onend = async () => {
         console.debug('ended');
         setTimeout(() => {
-          showmicIconNormalMsg('Closing voice search');
+          showVoiceInputNormalMsg('Closing voice search');
           micIconModal.hide();
         }, 3000);
       };
