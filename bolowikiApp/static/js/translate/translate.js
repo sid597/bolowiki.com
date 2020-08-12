@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
     request.onload = () => {
       const responseData = request.responseText;
       console.log(responseData);
-      translatedVoiceFiles.innerHTML = `<audio id="audioControl" controls style="width: 100%;"><source src="${responseData}" type="audio/mpeg" />Your browser does not support the audio element.</audio>`;
+      translatedVoiceFiles.innerHTML += `<span class="col-4 align-middle"> ${nameToSaveWith.value}</span> <span class="col-8"><audio id="audioControl" controls style="width: 100%;"><source src="${responseData}" type="audio/mpeg" />Your browser does not support the audio element.</audio></span>`;
     };
     const postData = JSON.stringify({
       textToConvert: textToTranslateData,
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // #############################################################################
-  // ## Dropdown buttons update text                                      ##
+  // ## Dropdown buttons update text                                            ##
   // #############################################################################
 
   // Language translate from dropdown
