@@ -175,6 +175,9 @@ document.addEventListener('DOMContentLoaded', () => {
         console.debug(`recognition complete here is your result ${trans}`);
         micIconResult.innerHTML = trans;
         micIconQuery = trans;
+        console.log(`textToTranslate.innerHTML is : ${textToTranslate.innerHTML}`);
+        textToTranslate.innerHTML = trans;
+        requestToTextTranslate();
         return trans;
       };
 
@@ -191,6 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         console.debug(` error occured : ${e.error}`);
       };
+
       recognition.onend = async () => {
         console.debug('ended');
         setTimeout(() => {
