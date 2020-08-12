@@ -173,8 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const trans = e.results[0][0].transcript;
 
         console.debug(`recognition complete here is your result ${trans}`);
-        micIconResult.innerHTML = trans;
-        micIconQuery = trans;
+        showmicIconNormalMsg(trans);
         console.log(`textToTranslate.innerHTML is : ${textToTranslate.innerHTML}`);
         textToTranslate.innerHTML = trans;
         requestToTextTranslate();
