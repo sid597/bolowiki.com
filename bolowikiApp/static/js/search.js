@@ -228,7 +228,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function getAudioFileData(functionToHandleTheResponse, articleWikiLink) {
     showSpinner();
-    console.debug('inside getAudioFileData');
     console.debug(`function to handle response is ${functionToHandleTheResponse}`);
     const request = new XMLHttpRequest();
     request.open('POST', '/text_to_speech/wikipedia/');
@@ -249,7 +248,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const data = new FormData();
     data.append('wikipediaLink', articleWikiLink);
     data.append('articleLanguage', queryLanguage);
-    console.debug(`data is ${data}`);
+    console.debug(`sending request to text_to_speech/wikipedia with wikipediaLink ${articleWikiLink} articleLanguage ${queryLanguage}`);
     // request.setRequestHeader("Content-type", "application/json")
     request.send(data);
   }
@@ -271,55 +270,99 @@ document.addEventListener('DOMContentLoaded', async () => {
     return res;
   }
 
-  function getWikipediaSearchLink(searchQueryText) {
-    console.log(queryLanguage);
-    const link = `${wikiLinksDict[queryLanguage] + searchQueryText}&namespace=0&limit=10`;
-    console.log(link);
-    return link;
-  }
-
-  function createSuggestionList(data, searchQueryText) {
-    const l = ['<ul class="list-group list-group-flush">'];
-
-    // console.debug(l)
-
-    for (let i = 0; i < 10; i += 1) {
-      const textLink = data[3][i];
-      const text = data[1][i];
-      if (text) {
-        const matchText = matchString(searchQueryText, text);
-        const unmatchedText = text.slice(matchText.length, text.length);
-        // console.debug(`${searchQueryText}-->`, matchText, '||', unmatchedText)
-        if (matchText) {
-          if (unmatchedText) {
-            l.push(`<a class="resultLink" href=${textLink}> <li class="listitem"><span style="font-weight:600">${matchText}</span><span>${unmatchedText}</span></li></a>`);
-          } else {
-            l.push(`<a class="resultLink" href=${textLink}> <li class="listitem"><b>${matchText}</b></li></a>`);
-          }
-        }
-        // document.querySelector('.suggestions').append(ii)
-      }
-    }
-    l.push('</ul>');
-    searchSuggestionList.innerHTML = l.join('');
-  }
+  // function addListnerToSuggestionListItem()
 
   function getWikipediaresponseAsList(searchQueryText) {
-    const wikiLink = getWikipediaSearchLink(searchQueryText);
+    /*
+     Use wikipedia search api to get results for the searchQueryText
+     Wikipedia search api has format :
+     https://<Insert language>.wikipedia.org/w/api.php?action=opensearch&format=json&origin=*&formatversion=2&search=<Insert search query>&namespace=0&limit=<Insert no of results to show>'
+
+     return format for let's say "Hampi" is :
+     [
+      "Hampi",
+      [
+          "Hampi",
+          ...
+      ],
+      [
+          "Hampi, also referred to as the Group of Monuments at Hampi",
+          ...
+      ],
+      [
+          "https://en.wikipedia.org/wiki/Hampi",
+          ...
+      ]
+    ]
+
+    i.e [search query, [list of search results heading], [list of description for earch search heading], [list of links for each search heading]]
+    */
+    const wikiLink = `${wikiLinksDict[queryLanguage] + searchQueryText}&namespace=0&limit=10`;
+
+    // Make a request to wikipedia using this link
     const request = new XMLHttpRequest();
     request.open('GET', wikiLink);
 
+    // When result is returned
     request.onload = () => {
       const data = JSON.parse(request.responseText);
-      createSuggestionList(data, searchQueryText);
-      queryTopResultLink = data[3][0];
-      queryTopResultText = data[1][0];
+      console.debug(`data from getWikipediaSearchLink is ${request.responseText}`);
+      // from the list of links get the first one
+      // from the list of results select first one
+      [queryTopResultLink, queryTopResultText] = [data[3][0], data[1][0]];
+
+      // Create suggestion list
+      const l = ['<ul class="suggestionsList list-group list-group-flush">'];
+
+      for (let i = 0; i < 10; i += 1) {
+        const textLink = data[3][i];
+        const text = data[1][i];
+        if (text) {
+          const matchText = matchString(searchQueryText, text);
+          const unmatchedText = text.slice(matchText.length, text.length);
+          // console.debug(`${searchQueryText}-->`, matchText, '||', unmatchedText)
+          if (matchText) {
+            if (unmatchedText) {
+              l.push(` <li class="sl${i} listitem" id="${textLink}"><span style="font-weight:600">${matchText}</span><span>${unmatchedText}</span></li>`);
+            } else {
+              l.push(` <li class="sl${i} listitem"><b>${matchText}</b></li>`);
+            }
+          }
+          // document.querySelector('.suggestions').append(ii)
+        }
+      }
+
+      searchSuggestionList.innerHTML = l.join('');
+      l.push('</ul>');
+
+      // If some item in the list is clicked then fetch data related to that item
+      const suggestionList = document.querySelector('.suggestionsList');
+      suggestionList.addEventListener('click', (e) => {
+        console.debug(e.target.nodeName);
+        if (e.target && (e.target.nodeName === 'LI' || e.target.nodeName === 'SPAN')) {
+          console.debug(`List item is ${e.target.id}`);
+          searchQueryInsideInputBox('both', queryTopResultLink);
+        }
+      });
+
+      // If mouse over some list item then highlight that line
+      for (let i = 0; i < 10; i += 1) {
+        const suggestionListItem = document.querySelector(`.sl${i}`);
+        suggestionListItem.addEventListener('mouseover', (e) => {
+          if (e.target && (e.target.nodeName === 'LI')) {
+            suggestionListItem.style.backgroundColor = '#eef3f5';
+            suggestionListItem.style.borderRadius = 9;
+          }
+        });
+        suggestionListItem.addEventListener('mouseout', (e) => {
+          if (e.target && (e.target.nodeName === 'LI')) {
+            suggestionListItem.style.backgroundColor = 'white';
+          }
+        });
+      }
     };
     request.send(null);
-    // console.debug(request.responseText)
   }
-
-
 
 
   // #############################################################################
@@ -358,8 +401,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-
-
   function mouseoverMainDiv() {
     searchMainDiv.style.boxShadow = '0 1px 6px 0 rgba(32,33,36,0.28)';
     searchMainDiv.style.borderColor = 'rgba(223,225,229,0)';
@@ -383,13 +424,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function showSuggestionsForQueryInInputBox(query) {
-    console.debug(`query for suggestion is ${query}`);
     focusedStyle();
-    if (query) {
-      const searchQuery = query.trim();
-      if (searchQuery) {
-        getWikipediaresponseAsList(searchQuery);
-      }
+    const searchQuery = query.trim();
+    console.debug(`search query for showing suggestions is ${searchQuery}`);
+    if (searchQuery) {
+      getWikipediaresponseAsList(searchQuery);
     }
   }
 
@@ -400,6 +439,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   mainDiv.addEventListener('mouseover', () => {
     mouseoverMainDiv();
   });
+
   mainDiv.addEventListener('mouseout', () => {
     if (searchBox.value === '') {
       mouseoutMainDiv();
@@ -409,8 +449,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   searchBox.addEventListener('keyup', (e) => {
+    console.debug(`keyup event happended ${e.target.value}`);
     const query = e.target.value;
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && query) {
       if (queryTopResultLink) {
         console.debug('keyup event with enter key');
         searchQueryInsideInputBox('both', queryTopResultLink);
@@ -418,15 +459,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         getWikipediaresponseAsList(query);
         searchQueryInsideInputBox('both', queryTopResultLink);
       }
-    } else {
-      showSuggestionsForQueryInInputBox(query);
     }
   });
 
   searchBox.addEventListener('input', (e) => {
-    if (typeof e.data === 'undefined') {
-      showSuggestionsForQueryInInputBox(e.data);
-    }
+    console.debug(`input event ${e.data}`);
+    console.debug(`input event with target value ${e.target.value}`);
+    showSuggestionsForQueryInInputBox(e.target.value);
   });
 
   languageSelector.addEventListener('click', () => {
