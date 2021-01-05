@@ -5,7 +5,7 @@ import gc
 from flask import current_app as app
 from flask import render_template, url_for, redirect, flash, request, session, Blueprint
 from passlib.hash import sha256_crypt
-from pymysql import escape_string as thwart
+from pgdb import escape_string as thwart
 from wtforms import Form, validators, PasswordField, TextField
 
 

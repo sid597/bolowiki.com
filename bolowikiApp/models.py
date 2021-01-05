@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.dialects.mysql import INTEGER
+from sqlalchemy.dialects.postgresql import INTEGER
 
 db = SQLAlchemy()
 
