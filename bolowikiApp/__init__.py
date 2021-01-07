@@ -5,6 +5,8 @@ from pprint import pprint
 # External Packages
 from flask_migrate import Migrate
 from flask import Flask
+from dotenv import load_dotenv
+from os.path import join, dirname
 # from flask import current_app as app
 
 # Local Packages
@@ -13,6 +15,9 @@ from bolowikiApp.config import Config
 
 
 migrate = Migrate()
+
+dotenv_path = join(dirname(__file__), '.env')
+load_dotenv(dotenv_path)
 
 
 def create_app(config_class=Config):

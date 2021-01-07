@@ -10,10 +10,10 @@ class User(db.Model):
     username = db.Column(db.String(20))
     password = db.Column(db.String(100))
     email = db.Column(db.String(100))
-    settings = db.Column(db.Text(32500))
-    tracking = db.Column(db.Text(32500))
+    settings = db.Column(db.Text())
+    tracking = db.Column(db.Text())
     rank = db.Column(db.String(3))
-    wikiLinks = db.Column(db.Text(32500), default='')
+    wikiLinks = db.Column(db.Text(), default='')
     remainingLimit = db.Column(INTEGER(), default=20000)
 
 
@@ -29,4 +29,4 @@ class AllWikiLinks(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     wikiLink = db.Column(db.String(200))
     location = db.Column(db.String(500))
-    text = db.Column(db.Text(50000))
+    text = db.Column(db.Text())
