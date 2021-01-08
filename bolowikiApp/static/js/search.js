@@ -323,9 +323,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           // console.debug(`${searchQueryText}-->`, matchText, '||', unmatchedText)
           if (matchText) {
             if (unmatchedText) {
-              l.push(` <li class="sl${i} listitem" id="${textLink}"><span style="font-weight:600">${matchText}</span><span>${unmatchedText}</span></li>`);
+              l.push(` <li class="sl${i} listitem" id="${textLink}"><span id="${textLink}" style="font-weight:600">${matchText}</span><span id="${textLink}">${unmatchedText}</span></li>`);
             } else {
-              l.push(` <li class="sl${i} listitem"><b>${matchText}</b></li>`);
+              l.push(` <li class="sl${i} listitem" id="${textLink}"><b id="${textLink}">${matchText}</b></li>`);
             }
           }
           // document.querySelector('.suggestions').append(ii)
@@ -339,9 +339,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       const suggestionList = document.querySelector('.suggestionsList');
       suggestionList.addEventListener('click', (e) => {
         console.debug(e.target.nodeName);
-        if (e.target && (e.target.nodeName === 'LI' || e.target.nodeName === 'SPAN')) {
+        if (e.target && (['LI', 'SPAN', 'B'].includes(e.target.nodeName))) {
           console.debug(`List item is ${e.target.id}`);
-          searchQueryInsideInputBox('both', queryTopResultLink);
+          searchQueryInsideInputBox('both', e.target.id);
         }
       });
 
