@@ -4,7 +4,7 @@ from urllib.parse import urlparse
 from flask import current_app as app
 
 # Local packages
-from ..dbOperations import methodsForTTS, setUserRemainingLimit
+from ..dbOperations import getTextToSpeech, setUserRemainingLimit
 from .textToSpeech import GoogleTextToSpeech
 from ..utils import remainingCharacterLimitNotZero, login_required
 
@@ -14,7 +14,7 @@ textToSpeech_bp = Blueprint('textToSpeech_bp', __name__, url_prefix='/text_to_sp
 @textToSpeech_bp.route('/wikipedia/', methods=['GET', 'POST'])
 def getWiki():
     """ Receive a request to convert the clicked link to audio
-        check if link is present in AllWikiLinks
+        check if link is present in database under AllWikiLinks
             yes :
                 return from there
             no  :
@@ -29,6 +29,7 @@ def getWiki():
         https://en.wikipedia.org/wiki/Anarchy#Etymology
         ParseResult(scheme='https', netloc='en.wikipedia.org', path='/wiki/Anarchy',
                     params='', query='', fragment='Etymology')
+        Fragment basically means in wikipedia get a particular topic from that wikipedia
     """
     try:
         acceptedWikipediaUrls = {'en.wikipedia.org', 'hi.wikipedia.org'}
@@ -46,8 +47,9 @@ def getWiki():
         wikiLinkToBeParsed, articleLanguage, type(wikiLinkToBeParsed)))
         parsedUrl = urlparse(wikiLinkToBeParsed)
         app.logger.info("parsedUrl is : %s" % str(parsedUrl))
-        if parsedUrl.netloc not in acceptedWikipediaUrls or parsedUrl.scheme != 'https':
 
+        # Check if the url passed by user is not something other than for wikipedia
+        if parsedUrl.netloc not in acceptedWikipediaUrls or parsedUrl.scheme != 'https':
             msg = "Pass a valid wikipedia url, for e.g :  https://en.wikipedia.org/wiki/Anarchy"
             return jsonify({
                 'txt': msg, 'mediaLocation':
@@ -60,7 +62,7 @@ def getWiki():
 
         if 'logged_in' in session:
             username = session['username']
-            newTTS = methodsForTTS(
+            newTTS = getTextToSpeech(
                 username,
                 path,
                 articleLanguage,
@@ -82,7 +84,7 @@ def getWiki():
 
         username = 'UserNotLoggedIn'
         fragment = ''
-        newTTS = methodsForTTS(
+        newTTS = getTextToSpeech(
             username,
             path,
             articleLanguage,

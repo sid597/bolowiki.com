@@ -73,8 +73,11 @@ def createNewUser(username, email, password):
 
 
 
-class methodsForTTS():
-    """Methods used for text-to-speech
+class getTextToSpeech():
+    """
+     Used to get data for the wikilink passed by the user 
+     First checks ig the data for that wikilink is already extracted or not
+     if not ask the wikipedia module to do so
     """
 
     def __init__(self, username, path, articleLanguage, wikipediaNetLoc, fragment=''):
@@ -95,36 +98,50 @@ class methodsForTTS():
 
     @property
     def orchestrator(self):
-        app.logger.info("Inside orchestrator")
-        app.logger.info("self.currentUserUsername is %s " %
-                        self.currentUserUsername)
-        app.logger.info("self.wikipediaArticlePath is %s " %
-                        self.wikipediaArticlePath)
-        app.logger.info("self.wikipediaArticleFragment is %s " %
-                        self.wikipediaArticleFragment)
-        app.logger.info("self.nameToSaveWith is %s " % self.nameToSaveWith)
-        app.logger.info("self.filename is %s " % self.filename)
+        '''
+        extracts data for the current user, cheks if the wikilink is already in db etc. 
+        Since this method does so much work I named it orchestrator
+        
+        '''
+        try :
+            app.logger.info("Inside orchestrator")
+            app.logger.info("self.currentUserUsername is %s " %
+                            self.currentUserUsername)
+            app.logger.info("self.wikipediaArticlePath is %s " %
+                            self.wikipediaArticlePath)
+            app.logger.info("self.wikipediaArticleFragment is %s " %
+                            self.wikipediaArticleFragment)
+            app.logger.info("self.nameToSaveWith is %s " % self.nameToSaveWith)
+            app.logger.info("self.filename is %s " % self.filename)
 
-        currentUser = getUserDataFirst(self.currentUserUsername)
-        userWikiLinks = currentUser.wikiLinks
-        isArticleThere = getAllWikiLinksDataFirst(self.nameToSaveWith)
-        self.getWikipediaArticleFragment()
-        if self.nameToSaveWith in userWikiLinks:
-            # TODO somehow tell the user to move to that location
-            app.logger.info("Article data %s" %(isArticleThere.location, self.articleFragment, articleContentsList))
+            app.logger.info("hey")
+            currentUser = getUserDataFirst(self.currentUserUsername)
+            app.logger.info("current user is %s" %currentUser)
+            userWikiLinks = currentUser.wikiLinks
+            app.logger.info("currentUser is %s and user wililinks are %s" %(currentUser ,userWikiLinks))
+            isArticleThere = getAllWikiLinksDataFirst(self.nameToSaveWith)
+            self.getWikipediaArticleFragment()
+            app.logger.info("Orchestrator extracted article from wikipedia")
+            app.logger.info("isArticleThere %s, nameTosaveWith is %s and userWikiLinks is %s " %(isArticleThere, self.nameToSaveWith, userWikiLinks))
+            # Check if the link is saved in db
+            # Check if the wikilink is already in this users list i.e they previously searched for that if not add this 
+            # new link to that users table
+            if isArticleThere is None:
+                app.logger.info("Article is none ")
+
+                app.logger.info("Article to convert is : %s " %self.articleFragment)
+                return self.textToSpeech(self.articleFragment), self.articleFragment, self.articleContentsList, self.articleFragmentLength, self.articleTotalCharacterCount
+            if self.nameToSaveWith in userWikiLinks:
+                # TODO somehow tell the user to move to that location
+                # app.logger.info("Article data %s" %(isArticleThere.location, self.articleFragment, self.articleContentsList))
+                return isArticleThere.location, self.articleFragment, self.articleContentsList, self.articleFragmentLength, self.articleTotalCharacterCount
+
+            self.addToUsersWikiLinks()
+            
+            app.logger.info("Article is there and its location is : %s" % isArticleThere.location)
             return isArticleThere.location, self.articleFragment, self.articleContentsList, self.articleFragmentLength, self.articleTotalCharacterCount
-
-        self.addToUsersWikiLinks()
-        if isArticleThere is None:
-            app.logger.info("Article is none ")
-
-            app.logger.info("Article to convert is : %s " %
-                            self.articleFragment)
-            return self.textToSpeech(
-                self.articleFragment), self.articleFragment, self.articleContentsList, self.articleFragmentLength, self.articleTotalCharacterCount
-        app.logger.info("Article is there and its location is : %s" %
-                        isArticleThere.location)
-        return isArticleThere.location, self.articleFragment, self.articleContentsList, self.articleFragmentLength, self.articleTotalCharacterCount
+        except Exception as e:
+            app.logger.error("Error in orchestrator %s" %e)
 
     def addToUsersWikiLinks(self):
         try:
@@ -148,21 +165,24 @@ class methodsForTTS():
             return str(e)
 
     def getWikipediaArticleFragment(self):
+        '''
+           Get wikipedia article for the fragment passed by user for wikilink
+        
+        '''
         try:
             app.logger.info("Inside getWikipediaArticleFragment")
             article = getWikipediaArticleDataFirst(self.nameWithoutFragment)
             app.logger.info("article is : %s" % article)
+
+            # If this article already in db
             if article is not None:
                 articleDict = json.loads(article.articleDict)
                 # pprint(articleDict)
-                self.articleFragment = ''.join(
-                    articleDict[self.wikipediaArticleFragment][0])
+                self.articleFragment = ''.join(articleDict[self.wikipediaArticleFragment][0])
                 app.logger.info("Got article fragment ")
-                app.logger.info("article fragment is %s" %
-                                self.articleFragment)
+                app.logger.info("article fragment is %s" %self.articleFragment)
                 self.articleFragmentLength = len(self.articleFragment)
-                app.logger.debug("articleFragmentLength is %s" %
-                                 self.articleFragmentLength)
+                app.logger.info("articleFragmentLength is %s" %self.articleFragmentLength)
 
                 self.articleContentsList = [i for i in articleDict]
 
@@ -170,23 +190,18 @@ class methodsForTTS():
             app.logger.info("wikipedia url is : %s" % wikiUrl)
             parsedArticle = WikipediaParser(wikiUrl)
             articleDict, articleTotalCharacterCount = parsedArticle.instantiate()
-            app.logger.debug("articleTotalCharacterCount is %s" %
-                             articleTotalCharacterCount)
+            app.logger.info("articleTotalCharacterCount is %s" %articleTotalCharacterCount)
             self.articleTotalCharacterCount = articleTotalCharacterCount
             app.logger.info("wikipedia parsedArticle  is : %s" % parsedArticle)
             # articleDict = parsedArticle.wikiDict
             jsonifiedArticle = json.dumps(articleDict)
-            createNewWikipediaArticle(
-                self.nameWithoutFragment, jsonifiedArticle)
+            createNewWikipediaArticle(self.nameWithoutFragment, jsonifiedArticle)
             app.logger.info("Commit successful")
-            app.logger.info("Checking if article got commited :  %s" % (
-                getWikipediaArticleDataFirst(self.nameWithoutFragment)).articleDict)
-            self.articleFragment = ''.join(
-                articleDict[self.wikipediaArticleFragment][0])
+            app.logger.info("Checking if article got commited :  %s" % (getWikipediaArticleDataFirst(self.nameWithoutFragment)).articleDict)
+            self.articleFragment = ''.join(articleDict[self.wikipediaArticleFragment][0])
             self.articleContentsList = [[contentName, articleDict[contentName][1]] for contentName in articleDict]
             self.articleFragmentLength = len(self.articleFragment)
-            app.logger.debug("articleFragmentLength is %s" %
-                             self.articleFragmentLength)
+            app.logger.info("articleFragmentLength is %s" %self.articleFragmentLength)
 
         except Exception as e:
             app.logger.error("error in get wiki article fragment : %s" % e)

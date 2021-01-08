@@ -8,35 +8,40 @@ def GoogleTextToSpeech(textToConvert, nameToSaveWith, translateLanguage, voiceGe
         'MALE': texttospeech.SsmlVoiceGender.MALE,
         'FEMALE': texttospeech.SsmlVoiceGender.FEMALE
     }
-    print('translateLanguage is : %s' % translateLanguage)
+    app.logger.info('translateLanguage is : %s' % translateLanguage)
     languageSettings = {'hi-IN':
-                        {
-                            'language_code': 'hi-IN',
-                            'ssml_gender': ssmlVoiceGender[voiceGender],
-                            'speaking_rate': 0.7
-                        },
-
-                        'en-US': {
-                            'language_code': 'en-US',
-                            'ssml_gender': ssmlVoiceGender[voiceGender],
-                            'speaking_rate': 1
-                        },
-                        'en-IN': {
-                            'language_code': 'en-IN',
-                            'ssml_gender': ssmlVoiceGender[voiceGender],
-                            'speaking_rate': 1
-                        },
-                        'en-GB': {
-                            'language_code': 'en-GB',
-                            'name' : "en-GB-Wavenet-D",
-                            'ssml_gender': ssmlVoiceGender[voiceGender],
-                            'speaking_rate': 1
-                        },
+                            {
+                                'language_code': 'hi-IN',
+                                'ssml_gender': ssmlVoiceGender[voiceGender],
+                                'speaking_rate': 0.7
+                            }, 'hi':
+                            {
+                                'language_code': 'hi-IN',
+                                'speaking_rate': 0.7,
+                                'ssml_gender': ssmlVoiceGender[voiceGender],
+                            },'en-US': {
+                                'language_code': 'en-US',
+                                'ssml_gender': ssmlVoiceGender[voiceGender],
+                                'speaking_rate': 1
+                            },'en-IN': {
+                                'language_code': 'en-IN',
+                                'ssml_gender': ssmlVoiceGender[voiceGender],
+                                'speaking_rate': 1
+                            },'en-GB': {
+                                'language_code': 'en-GB',
+                                'name': "en-GB-Wavenet-D",
+                                'ssml_gender': ssmlVoiceGender[voiceGender],
+                                'speaking_rate': 1
+                            },'en': {
+                                'language_code': 'en-GB',
+                                'name': 'en-GB-Wavenet-D',
+                                'speaking_rate': 1,
+                                'ssml_gender': ssmlVoiceGender[voiceGender],
+                            }
                         }
     app.logger.info("Inside GoogleTextToSpeech")
-    # print(textToConvert)
-    app.logger.info(
-        'Text which is to be converted to speech is %s' % textToConvert)
+    app.logger.info(textToConvert)
+    app.logger.info('Text which is to be converted to speech is %s' % textToConvert)
 
     # Instantiates a client
     client = texttospeech.TextToSpeechClient()
@@ -70,8 +75,8 @@ def GoogleTextToSpeech(textToConvert, nameToSaveWith, translateLanguage, voiceGe
         with open(mediaLocation, "wb") as out:
             # Write the response to the output file.
             out.write(response.audio_content)
-            # print('Audio content written to file "output.mp3"')
-        return "../static/textToSpeech/" + nameToSaveWith + ".mp3"
+            app.logger.info('Audio content written to file "output.mp3"')
+        return "../static/textToSpeech/" + nameToSaveWith 
     else:
         # TODO: change the location
         saveDirectory = os.getcwd() + "/bolowikiApp/static/translate/"
@@ -81,7 +86,5 @@ def GoogleTextToSpeech(textToConvert, nameToSaveWith, translateLanguage, voiceGe
         with open(mediaLocation, "wb") as out:
             # Write the response to the output file.
             out.write(response.audio_content)
-            # print('Audio content written to file "output.mp3"')
-        return "../static/translate/" + nameToSaveWith + ".mp3"
-    
-
+            app.logger.info('Audio content written to file "output.mp3"')
+        return "../static/translate/" + nameToSaveWith 
