@@ -2,8 +2,14 @@
 /* eslint-disable no-use-before-define */
 document.addEventListener('DOMContentLoaded', async () => {
   const isChrome = !!window.chrome;
+
+  // Top search result
   let queryTopResultLink = null;
   let queryTopResultText = null;
+  
+  // Data for the link clicked from searched results
+  let queryResultText = null;
+  let queryResultLink = null;
   let voiceSearchQuery = null;
   const searchIcon = document.querySelector('#searchSVG');
   const searchMainDiv = document.querySelector('#searchMainDiv');
@@ -175,7 +181,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function createWikipediaContentLinks(wikiContentText) {
     const wikiContentTextJoined = wikiContentText.split(' ').join('_');
-    const fullWikiLink = `${queryTopResultLink}#${wikiContentTextJoined}`;
+    const fullWikiLink = `${queryResultLink}#${wikiContentTextJoined}`;
     // console.debug(fullWikiLink)
     return fullWikiLink;
   }
@@ -188,8 +194,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         </li>`);
     for (let i = 1; i < articleText.length; i += 1) {
       l.push(`<li class="accordianCardLinks" 
-            id='${createWikipediaContentLinks(articleText[i])}'
-            >${articleText[i]}
+            id='${createWikipediaContentLinks(articleText[i][0])}'
+            >${articleText[i][0]}
             </li>`);
     }
     l.push('</ul>');
@@ -199,7 +205,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   function createNewAccordianCard(articleTitle, articleContents) {
     const articleContentsList = makeArticlesList(articleContents);
     const articleTitleForIds = articleTitle.split(' ').join('');
-    const newCard = `<div class="card">
+    const newCard = `<div class="card" style="margin-top: 20px">
         <div class="card-header" id="${articleTitleForIds}Wiki">
           <h2 class="mb-0">
             <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#${articleTitleForIds}collapse" aria-expanded="true" aria-controls="collapseOne">
@@ -235,14 +241,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       hideSpinner();
       console.debug(`request response text is ${request.responseText}`);
       const data = JSON.parse(request.responseText);
-      console.debug(`response data is ${data}`);
+      console.log(`query Text is ${queryResultText}, query Link is ${queryResultLink}`)
       if (functionToHandleTheResponse === 'showAudioModal') {
         showAudioModal(data.mediaLocation, data.txt, articleWikiLink);
-      } else if (functionToHandleTheResponse === 'createNewAccordian') {
-        createNewAccordianCard(queryTopResultText, data.articleContents);
       } else if (functionToHandleTheResponse === 'both') {
         showAudioModal(data.mediaLocation, data.txt, articleWikiLink);
-        createNewAccordianCard(queryTopResultText, data.articleContents);
+        createNewAccordianCard(queryResultText, data.articleContents);
       }
     };
     const data = new FormData();
@@ -270,7 +274,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     return res;
   }
 
-  // function addListnerToSuggestionListItem()
 
   function getWikipediaresponseAsList(searchQueryText) {
     /*
@@ -340,7 +343,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       suggestionList.addEventListener('click', (e) => {
         console.debug(e.target.nodeName);
         if (e.target && (['LI', 'SPAN', 'B'].includes(e.target.nodeName))) {
-          console.debug(`List item is ${e.target.id}`);
+          const wikiArticleLink = e.target.id;
+          console.debug(`List item is ${wikiArticleLink}`);
+          queryResultLink = String(wikiArticleLink);
+          queryResultText = String(wikiArticleLink.split('/').slice(-1));
           searchQueryInsideInputBox('both', e.target.id);
         }
       });
@@ -349,13 +355,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       for (let i = 0; i < 10; i += 1) {
         const suggestionListItem = document.querySelector(`.sl${i}`);
         suggestionListItem.addEventListener('mouseover', (e) => {
-          if (e.target && (e.target.nodeName === 'LI')) {
+          if (e.target && (['LI', 'SPAN', 'B'].includes(e.target.nodeName))) {
             suggestionListItem.style.backgroundColor = '#eef3f5';
             suggestionListItem.style.borderRadius = 9;
           }
         });
         suggestionListItem.addEventListener('mouseout', (e) => {
-          if (e.target && (e.target.nodeName === 'LI')) {
+          if (e.target && (['LI', 'SPAN', 'B'].includes(e.target.nodeName))) {
             suggestionListItem.style.backgroundColor = 'white';
           }
         });
@@ -433,6 +439,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   searchIcon.addEventListener('click', () => {
+    queryResultText = String(queryTopResultText);
+    queryResultLink = String(queryTopResultLink);
     searchQueryInsideInputBox('both', queryTopResultLink);
   });
 
@@ -452,13 +460,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.debug(`keyup event happended ${e.target.value}`);
     const query = e.target.value;
     if (e.key === 'Enter' && query) {
-      if (queryTopResultLink) {
-        console.debug('keyup event with enter key');
-        searchQueryInsideInputBox('both', queryTopResultLink);
-      } else {
+      if (!queryTopResultLink) {
         getWikipediaresponseAsList(query);
-        searchQueryInsideInputBox('both', queryTopResultLink);
       }
+      queryResultText = String(queryTopResultText);
+      queryResultLink = String(queryTopResultLink);
+      searchQueryInsideInputBox('both', queryTopResultLink);
     }
   });
 

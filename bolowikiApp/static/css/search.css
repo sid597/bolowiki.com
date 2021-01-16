@@ -163,6 +163,10 @@ background-color: transparent;
   z-index: 999;
 }
 
+#wikipediaAccordian{
+  margin:auto;
+  width: 50%;
+}
 
 @media (max-width:475px){
   #mainDiv,#searchMainDiv{
