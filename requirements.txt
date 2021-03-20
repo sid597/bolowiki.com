@@ -20,7 +20,7 @@ gunicorn==20.0.4
 httpcore==0.9.1
 httpx==0.13.3
 itsdangerous==1.1.0
-Jinja2==2.11.2
+Jinja2==2.11.3
 lxml==4.5.1
 MarkupSafe==1.1.1
 mypy-extensions==0.4.3
